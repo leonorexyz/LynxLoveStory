@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lynx's Love Story ❤️</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Sacramento&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- Heart particle canvas -->
+    <canvas id="particles" aria-hidden="true"></canvas>
+
+    <!-- Lock Screen -->
+    <div id="lockscreen" role="dialog" aria-modal="true">
+      <div class="lock-card">
+        <div class="lock-title">A little secret for you 💖</div>
+        <p>Enter the 6-digit code to unlock</p>
+        <input id="pin" class="pin-input" type="password" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="off" />
+        <div>
+          <button id="unlockBtn" class="btn" type="button">Unlock</button>
+        </div>
+        <div id="error" class="error">Wrong password! Reload and try again.</div>
+        <p style="margin-top: 10px; opacity: 0.7; font-size: 0.85rem">Hint: our special number ✨</p>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <nav>
+      <div class="container nav-inner">
+        <div class="brand">Lynx's Love Story ❤️</div>
+        <div class="menu">
+          <a href="#home">Home</a>
+          <a href="#about">About</a>
+          <a href="#timeline">Timeline</a>
+          <a href="#letters">Letters</a>
+          <a href="#quotes">Quotes</a>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <!-- HOME -->
+      <section id="home">
+        <div class="container hero reveal card">
+          <div>
+            <h1>Hi, my Empress 🌹</h1>
+            <p>Every beat, every breath, every sunrise feels softer with you in it. This little corner of the web is just for you — a scrapbook of our story, wrapped in stardust and pink clouds. May this be our last pages, my number one</p>
+            <p style="margin-top: 12px"><strong>Scroll</strong> to wander through our memories, or <strong>Jump</strong> with the menu through our journey.</p>
+          </div>
+          <div class="image" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <!-- ABOUT -->
+      <section id="about">
+        <div class="container card reveal">
+          <div class="about-cols">
+            <div class="about-text">
+              <h2>About Us</h2>
+              <p style="margin-top: 6px">
+                From <strong>enemies-to-lovers</strong> — our story is a quite miracle. Thank you for your patience, your laughter, and your love that made my life shine brighter. I’m grateful for you. I love you so much ♡
+              </p>
+              <br />
+            </div>
+            <div class="about-img">
+              <img src="images/couple.jpg" alt="Couple" class="about-img-pic" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TIMELINE -->
+      <section id="timeline">
+        <div class="container card reveal">
+          <h2>Our Journey ♡</h2>
+          <div class="timeline" id="timelineList" style="margin-top: 10px"></div>
+        </div>
+      </section>
+
+      <!-- LETTERS -->
+      <section id="letters">
+        <div class="container reveal">
+          <div class="letters">
+            <div class="letter card">
+              <h3 style="margin: 0 0 6px">Letter 1</h3>
+              <p>I love you in the little ways: saving you the last bite, remembering your favorite songs, and cheering for you on quiet days.</p>
+            </div>
+            <div class="letter card">
+              <h3 style="margin: 0 0 6px">Letter 2</h3>
+              <p>Even on tough days, I choose you. A thousand times over. In every timeline.</p>
+            </div>
+            <div class="letter card">
+              <h3 style="margin: 0 0 6px">Letter 3</h3>
+              <p>Let’s keep building our tiny universe — one coffee, one cuddle, one adventure at a time.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUOTES -->
+      <section id="quotes">
+        <div class="container card reveal quotes">
+          <h2>Love Quotes</h2>
+          <div id="quoteBox" class="quote-box" style="margin-top: 10px">"You are my today and all of my tomorrows."</div>
+        </div>
+      </section>
+    </main>
+
+    <footer>Crafted with ♡ — just for you. ✨</footer>
+
+    <!-- Hidden YouTube Player (src set after unlock for user-gesture autoplay compliance) -->
+    <iframe id="yt" title="Background Music" width="0" height="0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="position: absolute; left: -9999px; top: -9999px"></iframe>
+
+    <!-- Floating player control -->
+    <div class="player" id="player" style="display: none">
+      <span class="status" id="playerStatus">Music: Paused</span>
+      <button id="toggleMusic" type="button">Play</button>
+    </div>
+
+    <script src="js/main.js"></script>
+  </body>
+</html>
