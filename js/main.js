@@ -20,10 +20,10 @@ const YT_ID = '5W0UH4VbptE'; // placeholder: "Falling In Love" acoustic style (e
 
 // Timeline data (edit dates/labels)
 const timelineData = [
-  { title: 'The day we met', date: '2021-01-01', note: 'Our story started here.' },
-  { title: 'First date', date: '2021-02-14', note: 'Nerves, laughter, and butterflies.' },
-  { title: 'First breakup', date: '2021-08-01', note: 'We learned, healed, and chose love again.' },
-  { title: 'Final date', date: '2021-12-25', note: 'Together, stronger, softer.' },
+  { title: 'The day our hearts connected', date: '2024-10-15', note: 'Our story started here.' },
+  { title: 'First commitment', date: '2025-01-20', note: 'Nerves, laughter, and butterflies.' },
+  { title: 'First breakup', date: '2025-05-22', note: 'We learned, healed, and chose love again.' },
+  { title: 'Final commitment', date: '2025-05-26', note: 'Together, stronger, softer.' },
 ];
 
 // Quotes rotation (customize freely)
