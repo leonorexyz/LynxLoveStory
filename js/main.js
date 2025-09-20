@@ -23,7 +23,7 @@ const timelineData = [
   { title: 'The day our hearts connected', date: '2024-10-15', note: 'Our story started here.' },
   { title: 'First commitment', date: '2025-01-20', note: 'Nerves, laughter, and butterflies.' },
   { title: 'First breakup', date: '2025-05-22', note: 'We learned, healed, and chose love again.' },
-  { title: 'Final commitment', date: '2025-05-26', note: 'Together, stronger, softer.' },
+  { title: 'Final commitment', date: '2025-06-26', note: 'Together, stronger, softer.' },
 ];
 
 // Quotes rotation (customize freely)
