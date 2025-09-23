@@ -16,7 +16,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // ======= CONFIG (edit these!) =======
 const PIN_CODE = '200125'; // required 6-digit pin
-const YT_ID = '5W0UH4VbptE'; // placeholder: "Falling In Love" acoustic style (example). Replace with your song.
+const PLAYLIST = [
+  // Add new songs or reorder existing ones here to adjust the playlist sequence.
+  { id: '5W0UH4VbptE', title: 'PK Haeman - Evergreen Part 2' },
+];
 
 // Timeline data (edit dates/labels)
 const timelineData = [
@@ -73,21 +76,44 @@ const playerStatus = document.getElementById('playerStatus');
 const toggleBtn = document.getElementById('toggleMusic');
 
 let isPlaying = false;
+let currentTrackIndex = 0;
+
+function buildPlaylistSrc(activeIndex, { autoplay = true, mute = false } = {}) {
+  const track = PLAYLIST[activeIndex];
+  if (!track) {
+    return '';
+  }
+  const playlistIds = PLAYLIST.map((item) => item.id).join(',');
+  const base = `https://www.youtube.com/embed/${track.id}`;
+  const params = new URLSearchParams({
+    autoplay: autoplay ? '1' : '0',
+    loop: '1',
+    playlist: playlistIds,
+    controls: '0',
+    modestbranding: '1',
+    rel: '0',
+    mute: mute ? '1' : '0',
+  });
+  return `${base}?${params.toString()}`;
+}
 
 function setYT(src) {
   yt.src = src;
 }
 
 function initMusicAfterGesture() {
-  const base = `https://www.youtube.com/embed/${YT_ID}`;
-  const params = `?autoplay=1&loop=1&playlist=${YT_ID}&controls=0&modestbranding=1&rel=0&mute=0`;
-  setYT(base + params);
-  isPlaying = true;
+  const src = buildPlaylistSrc(currentTrackIndex, { autoplay: true, mute: false });
+  if (src) {
+    setYT(src);
+    isPlaying = true;
+  }
   updatePlayerUI();
 }
 
 function updatePlayerUI() {
-  playerStatus.textContent = `Music: ${isPlaying ? '🎵 Playing: PK Haeman - Evergreen Part 2' : 'Stopped'}`;
+  const activeTrack = PLAYLIST[currentTrackIndex];
+  const title = activeTrack ? activeTrack.title : '';
+  playerStatus.textContent = `Music: ${isPlaying ? `🎵 Playing: ${title}` : 'Stopped'}`;
   toggleBtn.textContent = isPlaying ? 'Stop' : 'Play';
 }
 
@@ -96,14 +122,16 @@ toggleBtn.addEventListener('click', () => {
     return;
   }
   if (isPlaying) {
-    const base = `https://www.youtube.com/embed/${YT_ID}`;
-    const params = `?autoplay=0&loop=1&playlist=${YT_ID}&controls=0&modestbranding=1&rel=0&mute=1`;
-    setYT(base + params);
+    const src = buildPlaylistSrc(currentTrackIndex, { autoplay: false, mute: true });
+    if (src) {
+      setYT(src);
+    }
     isPlaying = false;
   } else {
-    const base = `https://www.youtube.com/embed/${YT_ID}`;
-    const params = `?autoplay=1&loop=1&playlist=${YT_ID}&controls=0&modestbranding=1&rel=0&mute=0`;
-    setYT(base + params);
+    const src = buildPlaylistSrc(currentTrackIndex, { autoplay: true, mute: false });
+    if (src) {
+      setYT(src);
+    }
     isPlaying = true;
   }
   updatePlayerUI();
