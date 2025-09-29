@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
 const PIN_CODE = '200125'; // required 6-digit pin
 const PLAYLIST = [
   // Add new songs or reorder existing ones here to adjust the playlist sequence.
+  { id: 'OT5msu-dap', title: 'Backstreet Boys - Shape of My Heart' },
   { id: '8MG--WuNW1Y', title: 'Wei Bird - Red Scarf' },
   { id: '5W0UH4VbptE', title: 'PK Haeman - Evergreen Part 2' },
 ];
@@ -54,7 +55,9 @@ function unlockSite() {
   lock.style.display = 'none';
   initMusicAfterGesture();
   reveal();
-  document.getElementById('player').style.display = 'flex';
+  if (playerEl) {
+    playerEl.style.display = 'flex';
+  }
 }
 
 function checkPin() {
@@ -73,8 +76,13 @@ pin.addEventListener('keydown', (e) => {
 
 // ======= YouTube background music =======
 const yt = document.getElementById('yt');
+const playerEl = document.getElementById('player');
 const playerStatus = document.getElementById('playerStatus');
+const playerTitle = document.getElementById('playerTitle');
 const toggleBtn = document.getElementById('toggleMusic');
+const prevBtn = document.getElementById('prevTrack');
+const nextBtn = document.getElementById('nextTrack');
+const playlistEl = document.getElementById('playlist');
 
 let isPlaying = false;
 let currentTrackIndex = 0;
@@ -99,44 +107,175 @@ function buildPlaylistSrc(activeIndex, { autoplay = true, mute = false } = {}) {
 }
 
 function setYT(src) {
-  yt.src = src;
+  if (yt) {
+    yt.src = src;
+  }
 }
 
-function initMusicAfterGesture() {
-  const src = buildPlaylistSrc(currentTrackIndex, { autoplay: true, mute: false });
-  if (src) {
-    setYT(src);
-    isPlaying = true;
+function highlightActiveTrack() {
+  if (!playlistEl) {
+    return;
   }
-  updatePlayerUI();
+  const tracks = playlistEl.querySelectorAll('.player-track');
+  tracks.forEach((item, index) => {
+    item.classList.toggle('is-active', index === currentTrackIndex);
+  });
+}
+
+function escapeHtml(text = '') {
+  return text.replace(/[&<>"']/g, (char) => {
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    };
+    return map[char] || char;
+  });
 }
 
 function updatePlayerUI() {
   const activeTrack = PLAYLIST[currentTrackIndex];
-  const title = activeTrack ? activeTrack.title : '';
-  playerStatus.textContent = `Music: ${isPlaying ? `🎵 Playing: ${title}` : 'Stopped'}`;
-  toggleBtn.textContent = isPlaying ? 'Stop' : 'Play';
+  if (playerTitle) {
+    playerTitle.textContent = activeTrack ? activeTrack.title : 'Select a song';
+  }
+  if (playerStatus) {
+    playerStatus.textContent = isPlaying ? 'Now Playing' : 'Paused';
+  }
+  if (toggleBtn) {
+    toggleBtn.textContent = isPlaying ? 'Pause' : 'Play';
+    toggleBtn.setAttribute('aria-pressed', String(isPlaying));
+  }
+  if (playerEl) {
+    playerEl.classList.toggle('is-playing', isPlaying);
+  }
+  highlightActiveTrack();
 }
 
-toggleBtn.addEventListener('click', () => {
-  if (!yt.src) {
+function renderPlaylist() {
+  if (!playlistEl) {
     return;
   }
-  if (isPlaying) {
-    const src = buildPlaylistSrc(currentTrackIndex, { autoplay: false, mute: true });
-    if (src) {
-      setYT(src);
-    }
-    isPlaying = false;
-  } else {
-    const src = buildPlaylistSrc(currentTrackIndex, { autoplay: true, mute: false });
-    if (src) {
-      setYT(src);
-    }
-    isPlaying = true;
+  playlistEl.innerHTML = PLAYLIST.map((track, index) => {
+    const number = String(index + 1).padStart(2, '0');
+    return `
+      <li class="player-track${index === currentTrackIndex ? ' is-active' : ''}">
+        <button type="button" data-index="${index}">
+          <span class="track-index">${number}</span>
+          <span class="track-title">${escapeHtml(track.title)}</span>
+        </button>
+      </li>
+    `;
+  }).join('');
+}
+
+function buildAndSetSrc(options) {
+  const src = buildPlaylistSrc(currentTrackIndex, options);
+  if (src) {
+    setYT(src);
   }
+}
+
+function playMusic() {
+  if (!PLAYLIST.length) {
+    return;
+  }
+  buildAndSetSrc({ autoplay: true, mute: false });
+  isPlaying = true;
   updatePlayerUI();
-});
+}
+
+function pauseMusic() {
+  if (!PLAYLIST.length) {
+    return;
+  }
+  if (!yt || !yt.src) {
+    isPlaying = false;
+    updatePlayerUI();
+    return;
+  }
+  buildAndSetSrc({ autoplay: false, mute: true });
+  isPlaying = false;
+  updatePlayerUI();
+}
+
+function selectTrack(index, { autoplay = true } = {}) {
+  if (!PLAYLIST[index]) {
+    return;
+  }
+  currentTrackIndex = index;
+  if (autoplay) {
+    playMusic();
+  } else {
+    buildAndSetSrc({ autoplay: false, mute: true });
+    isPlaying = false;
+    updatePlayerUI();
+  }
+}
+
+function initMusicAfterGesture() {
+  if (!PLAYLIST.length) {
+    return;
+  }
+  selectTrack(currentTrackIndex, { autoplay: true });
+}
+
+renderPlaylist();
+updatePlayerUI();
+
+if (toggleBtn) {
+  toggleBtn.addEventListener('click', () => {
+    if (!PLAYLIST.length) {
+      return;
+    }
+    if (!yt || !yt.src) {
+      selectTrack(currentTrackIndex, { autoplay: true });
+      return;
+    }
+    if (isPlaying) {
+      pauseMusic();
+    } else {
+      playMusic();
+    }
+  });
+}
+
+if (prevBtn) {
+  prevBtn.addEventListener('click', () => {
+    if (!PLAYLIST.length) {
+      return;
+    }
+    const nextIndex = (currentTrackIndex - 1 + PLAYLIST.length) % PLAYLIST.length;
+    const shouldAutoplay = isPlaying;
+    selectTrack(nextIndex, { autoplay: shouldAutoplay });
+  });
+}
+
+if (nextBtn) {
+  nextBtn.addEventListener('click', () => {
+    if (!PLAYLIST.length) {
+      return;
+    }
+    const nextIndex = (currentTrackIndex + 1) % PLAYLIST.length;
+    const shouldAutoplay = isPlaying;
+    selectTrack(nextIndex, { autoplay: shouldAutoplay });
+  });
+}
+
+if (playlistEl) {
+  playlistEl.addEventListener('click', (event) => {
+    const button = event.target.closest('button[data-index]');
+    if (!button) {
+      return;
+    }
+    const index = Number.parseInt(button.dataset.index, 10);
+    if (Number.isNaN(index)) {
+      return;
+    }
+    selectTrack(index, { autoplay: true });
+  });
+}
 
 // ======= Smooth reveal on scroll =======
 const revealEls = document.querySelectorAll('.reveal');

@@ -116,8 +116,23 @@
 
     <!-- Floating player control -->
     <div class="player" id="player" style="display: none">
-      <span class="status" id="playerStatus">Music: Paused</span>
-      <button id="toggleMusic" type="button">Play</button>
+      <div class="player-body">
+        <div class="player-art" aria-hidden="true">
+          <div class="player-disc"></div>
+          <div class="player-heart"></div>
+        </div>
+        <div class="player-main">
+          <span class="player-status" id="playerStatus">Paused</span>
+          <h3 class="player-title" id="playerTitle">Your love playlist</h3>
+          <div class="player-controls">
+            <button class="player-btn" id="prevTrack" type="button" aria-label="Previous track">⏮</button>
+            <button class="player-btn player-btn--primary" id="toggleMusic" type="button" aria-label="Play or pause">Play</button>
+            <button class="player-btn" id="nextTrack" type="button" aria-label="Next track">⏭</button>
+          </div>
+        </div>
+      </div>
+      <div class="player-list-header">Playlist</div>
+      <ul class="player-playlist" id="playlist"></ul>
     </div>
 
     <script src="js/main.js"></script>
