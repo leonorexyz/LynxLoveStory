@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
 const PIN_CODE = '200125'; // required 6-digit pin
 const PLAYLIST = [
   // Add new songs or reorder existing ones here to adjust the playlist sequence.
-  { id: 'OT5msu-dap', title: 'Backstreet Boys - Shape of My Heart' },
+  { id: 'OT5msu-dap8', title: 'Backstreet Boys - Shape of My Heart' },
   { id: '8MG--WuNW1Y', title: 'Wei Bird - Red Scarf' },
   { id: '5W0UH4VbptE', title: 'PK Haeman - Evergreen Part 2' },
 ];
