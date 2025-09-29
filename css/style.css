@@ -227,17 +227,203 @@ p {
   opacity: 0.75;
 }
 /* Letters */
-.letters {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 18px;
-  max-width: 1000px;
+.letters-shell {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.52));
+  padding: clamp(24px, 3vw, 40px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(24px, 4vw, 40px);
 }
-.letter {
-  padding: 18px 20px;
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.4));
-  border: 1px solid rgba(255, 255, 255, 0.7);
+
+.letters-header {
+  display: grid;
+  gap: 12px;
+  text-align: center;
+}
+
+.letters-header h2 {
+  font-family: 'Sacramento', cursive;
+  font-size: clamp(2.4rem, 6vw, 3.2rem);
+  color: #b31264;
+}
+
+.letters-header p {
+  margin: 0 auto;
+  max-width: 540px;
+  font-weight: 500;
+}
+
+.letter-gallery {
+  display: grid;
+  gap: clamp(18px, 3vw, 28px);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.love-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  padding: 24px 20px 26px;
+  text-align: center;
+  background: linear-gradient(160deg, rgba(255, 240, 246, 0.95), rgba(255, 214, 232, 0.7));
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 18px 36px rgba(224, 101, 151, 0.18);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.love-card::before,
+.love-card::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0));
+  z-index: 0;
+}
+
+.love-card::before {
+  width: 180px;
+  height: 180px;
+  top: -80px;
+  right: -60px;
+}
+
+.love-card::after {
+  width: 140px;
+  height: 140px;
+  bottom: -60px;
+  left: -40px;
+}
+
+.love-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 24px 40px rgba(224, 101, 151, 0.28);
+}
+
+.love-card__ring {
+  position: relative;
+  z-index: 1;
+  width: min(140px, 60%);
+  margin: 0 auto 14px;
+  filter: drop-shadow(0 14px 24px rgba(185, 45, 110, 0.3));
+}
+
+.love-card__ring img {
+  width: 100%;
+  display: block;
+}
+
+.love-card__meta {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 6px;
+}
+
+.love-card__title {
+  font-weight: 700;
+  color: #af145e;
+  letter-spacing: 0.5px;
+}
+
+.love-card__subtitle {
+  font-size: 0.92rem;
+  opacity: 0.8;
+}
+
+.love-card__button {
+  position: relative;
+  z-index: 1;
+  margin: 12px auto 0;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: none;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: white;
+  background: linear-gradient(120deg, #ff74b1, #ff4fa1);
+  box-shadow: 0 12px 26px rgba(255, 105, 180, 0.36);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.love-card__button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(255, 105, 180, 0.4);
+}
+
+.love-lightbox {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top, rgba(255, 182, 193, 0.45), rgba(255, 105, 180, 0.55));
+  backdrop-filter: blur(10px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(20px, 4vw, 40px);
+  z-index: 3000;
+}
+
+.love-lightbox.is-visible {
+  display: flex;
+}
+
+.love-lightbox__content {
+  position: relative;
+  max-width: min(90vw, 760px);
+  width: 100%;
+  border-radius: 28px;
+  padding: clamp(20px, 3vw, 32px);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.98), rgba(255, 235, 245, 0.92));
+  box-shadow: 0 35px 70px rgba(204, 52, 120, 0.35);
+  display: grid;
+  gap: clamp(14px, 3vw, 22px);
+}
+
+.love-lightbox__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(140deg, #ff4fa1, #ff74b1);
+  box-shadow: 0 10px 24px rgba(199, 42, 115, 0.25);
+  cursor: url('../images/heart_cursor.svg') 8 8, pointer;
+}
+
+.love-lightbox__close::before,
+.love-lightbox__close::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 20px;
+  height: 2px;
+  background: white;
+  border-radius: 999px;
+}
+
+.love-lightbox__close::before {
+  transform: rotate(45deg);
+}
+
+.love-lightbox__close::after {
+  transform: rotate(-45deg);
+}
+
+.love-lightbox__image {
+  width: 100%;
+  border-radius: 20px;
+  display: block;
+  box-shadow: 0 20px 35px rgba(199, 42, 115, 0.18);
+}
+
+.love-lightbox__caption {
+  text-align: center;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.4px;
+  color: #a01956;
 }
 /* Quotes */
 .quotes {
