@@ -23,6 +23,12 @@ body {
   background: radial-gradient(1200px 800px at 10% 10%, #fff6fa 0%, transparent 60%), radial-gradient(1000px 800px at 90% 20%, #fff2f7 0%, transparent 60%), linear-gradient(120deg, var(--bg1), var(--bg2));
   overflow-x: hidden;
   scroll-behavior: smooth;
+  cursor: url('../images/heart_cursor.svg') 8 8, auto;
+}
+
+a,
+button {
+  cursor: url('../images/heart_cursor.svg') 8 8, pointer;
 }
 #particles {
   position: fixed;
@@ -298,7 +304,7 @@ p {
   border: none;
   border-radius: 999px;
   font-weight: 700;
-  cursor: pointer;
+  cursor: url('../images/heart_cursor.svg') 8 8, pointer;
   color: white;
   background: linear-gradient(180deg, #ff7ab6, #ff4fa1);
   box-shadow: 0 12px 30px rgba(255, 105, 180, 0.35);
@@ -319,31 +325,225 @@ p {
 }
 .player {
   position: fixed;
-  right: 14px;
-  bottom: 14px;
+  right: 18px;
+  bottom: 18px;
   z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(340px, calc(100% - 36px));
+  padding: 18px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.58));
+  box-shadow: 0 18px 48px rgba(214, 31, 114, 0.28);
+  backdrop-filter: blur(16px);
+}
+
+.player-body {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.player-art {
+  position: relative;
+  width: 74px;
+  height: 74px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.15));
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), 0 10px 24px rgba(214, 31, 114, 0.25);
+}
+
+.player-disc {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffe3f1 0%, #ff9fcf 45%, #ff63a8 72%, #cf1d6b 100%);
+  box-shadow: inset 0 0 0 5px rgba(255, 255, 255, 0.18), inset 0 0 0 10px rgba(214, 31, 114, 0.18);
+  animation: spin-vinyl 14s linear infinite;
+}
+
+.player-disc::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 3px rgba(214, 31, 114, 0.35);
+}
+
+.player-heart {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  background: url('../images/heart_cursor.svg') center/contain no-repeat;
+  filter: drop-shadow(0 4px 10px rgba(214, 31, 114, 0.45));
+}
+
+.player-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.player-status {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: #9c6c88;
+}
+
+.player-title {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.3;
+  color: #c2185b;
+  font-weight: 700;
+}
+
+.player-controls {
   display: flex;
   gap: 10px;
   align-items: center;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.6));
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  padding: 10px 14px;
-  border-radius: 16px;
-  box-shadow: 0 10px 26px rgba(199, 42, 115, 0.25);
 }
-.player button {
+
+.player-btn {
+  flex: 1;
   border: none;
-  border-radius: 999px;
-  padding: 10px 14px;
-  cursor: pointer;
+  border-radius: 14px;
+  padding: 9px 12px;
   font-weight: 700;
+  font-size: 0.85rem;
+  color: #c2185b;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 6px 14px rgba(214, 31, 114, 0.16);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+  cursor: url('../images/heart_cursor.svg') 8 8, pointer;
+}
+
+.player-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(214, 31, 114, 0.2);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.player-btn--primary {
+  flex: 1.2;
   color: #fff;
   background: linear-gradient(180deg, #ff7ab6, #ff4fa1);
+  box-shadow: 0 12px 30px rgba(255, 105, 180, 0.35);
 }
-.player .status {
-  font-size: 0.9rem;
-  color: #7a5a6b;
+
+.player-btn--primary:hover {
+  background: linear-gradient(180deg, #ff8cc6, #ff5ca7);
+}
+
+.player-list-header {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #b07a94;
   font-weight: 700;
+  padding-left: 4px;
+}
+
+.player-playlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 160px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(214, 31, 114, 0.35) transparent;
+}
+
+.player-playlist::-webkit-scrollbar {
+  width: 6px;
+}
+
+.player-playlist::-webkit-scrollbar-thumb {
+  background: rgba(214, 31, 114, 0.35);
+  border-radius: 999px;
+}
+
+.player-track button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: none;
+  background: rgba(255, 255, 255, 0.42);
+  padding: 9px 12px;
+  border-radius: 14px;
+  color: #7a5a6b;
+  font-weight: 600;
+  font-size: 0.85rem;
+  font-family: inherit;
+  text-align: left;
+  cursor: url('../images/heart_cursor.svg') 8 8, pointer;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.player-track button:hover {
+  background: rgba(255, 255, 255, 0.78);
+  transform: translateY(-1px);
+  color: #c2185b;
+}
+
+.player-track .track-index {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}
+
+.player-track .track-title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-track.is-active button {
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 12px 30px rgba(255, 105, 180, 0.35);
+  color: #d63384;
+}
+
+.player.is-playing .player-disc {
+  animation-play-state: running;
+}
+
+.player .player-disc {
+  animation-play-state: paused;
+}
+
+@media (max-width: 600px) {
+  .player {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+  }
+}
+
+@keyframes spin-vinyl {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 footer {
   text-align: center;
