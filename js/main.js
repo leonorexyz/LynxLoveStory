@@ -1,19 +1,4 @@
 // Moved from index.html
-// ======= Lightbox for Letter 1 Image =======
-document.addEventListener('DOMContentLoaded', function () {
-  var link = document.getElementById('letter1-img-link');
-  var lightbox = document.getElementById('lightbox-letter1');
-  if (link && lightbox) {
-    link.addEventListener('click', function (e) {
-      e.preventDefault();
-      lightbox.style.display = 'flex';
-    });
-    lightbox.addEventListener('click', function () {
-      lightbox.style.display = 'none';
-    });
-  }
-});
-
 // ======= CONFIG (edit these!) =======
 const PIN_CODE = '200125'; // required 6-digit pin
 const PLAYLIST = [
@@ -22,6 +7,231 @@ const PLAYLIST = [
   { id: '8MG--WuNW1Y', title: 'Wei Bird - Red Scarf' },
   { id: '5W0UH4VbptE', title: 'PK Haeman - Evergreen Part 2' },
 ];
+
+const loveLetters = [
+  {
+    ring: 'images/Ring/ring_01-ayodance-sugar.png',
+    letter: "images/LP Love Letter ♡/Chapter 0 - Sugar - 20.01.2025.jpg",
+    chapter: 'Chapter 0',
+    flavor: 'Sugar',
+    date: '20.01.2025',
+  },
+  {
+    ring: 'images/Ring/ring_02-ayodance-sweet.png',
+    letter: "images/LP Love Letter ♡/Chapter 1 - Sweet - 20.01.2025.jpg",
+    chapter: 'Chapter 1',
+    flavor: 'Sweet',
+    date: '20.01.2025',
+  },
+  {
+    ring: 'images/Ring/ring_03-ayodance-candy.png',
+    letter: "images/LP Love Letter ♡/Chapter 2 - Candy - 21.01.2025.jpg",
+    chapter: 'Chapter 2',
+    flavor: 'Candy',
+    date: '21.01.2025',
+  },
+  {
+    ring: 'images/Ring/ring_04-ayodance-cherry.png',
+    letter: "images/LP Love Letter ♡/Chapter 3 - Cherry - 21.01.2025.jpg",
+    chapter: 'Chapter 3',
+    flavor: 'Cherry',
+    date: '21.01.2025',
+  },
+  {
+    ring: 'images/Ring/ring_05-ayodance-strawberry.png',
+    letter: "images/LP Love Letter ♡/Chapter 4 - Strawberry - 22.01.2025.jpg",
+    chapter: 'Chapter 4',
+    flavor: 'Strawberry',
+    date: '22.01.2025',
+  },
+  {
+    ring: 'images/Ring/ring_06-ayodance-honey.png',
+    letter: "images/LP Love Letter ♡/Chapter 5 - Honey - 23.01.2025.jpg",
+    chapter: 'Chapter 5',
+    flavor: 'Honey',
+    date: '23.01.2025',
+  },
+  {
+    ring: 'images/Ring/ring_07-ayodance-chocholate.png',
+    letter: "images/LP Love Letter ♡/Chapter 6 - Chocolate - 24.01.2025.jpg",
+    chapter: 'Chapter 6',
+    flavor: 'Chocolate',
+    date: '24.01.2025',
+  },
+  {
+    ring: 'images/Ring/ring_08-ayodance-cupcake.png',
+    letter: "images/LP Love Letter ♡/Chapter 7 - Cupcake - 25.01.2025.jpg",
+    chapter: 'Chapter 7',
+    flavor: 'Cupcake',
+    date: '25.01.2025',
+  },
+  {
+    ring: 'images/Ring/ring_09-ayodance-brownies.png',
+    letter: "images/LP Love Letter ♡/Chapter 8 - Brownies - 30.01.2025.jpg",
+    chapter: 'Chapter 8',
+    flavor: 'Brownies',
+    date: '30.01.2025',
+  },
+  {
+    ring: 'images/Ring/ring_10-ayodance-tiramisu.png',
+    letter: "images/LP Love Letter ♡/Chapter 9 - Tiramisu - 30.01.2025.jpg",
+    chapter: 'Chapter 9',
+    flavor: 'Tiramisu',
+    date: '30.01.2025',
+  },
+  {
+    ring: 'images/Ring/ring_11-ayodance-sakura.png',
+    letter: "images/LP Love Letter ♡/Chapter 10 - Sakura - 01.02.2025.jpg",
+    chapter: 'Chapter 10',
+    flavor: 'Sakura',
+    date: '01.02.2025',
+  },
+  {
+    ring: 'images/Ring/ring_12-ayodance-roses.png',
+    letter: "images/LP Love Letter ♡/Chapter 11 - Roses - 03.02.2025.jpg",
+    chapter: 'Chapter 11',
+    flavor: 'Roses',
+    date: '03.02.2025',
+  },
+  {
+    ring: 'images/Ring/ring_13-ayodance-edelweiss.png',
+    letter: "images/LP Love Letter ♡/Chapter 12 - Edelweiss - 14.02.2025.jpg",
+    chapter: 'Chapter 12',
+    flavor: 'Edelweiss',
+    date: '14.02.2025',
+  },
+  {
+    ring: 'images/Ring/ring_14-ayodance-lobelia.png',
+    letter: "images/LP Love Letter ♡/Chapter 13 - Lobelia - 21.03.2025.jpg",
+    chapter: 'Chapter 13',
+    flavor: 'Lobelia',
+    date: '21.03.2025',
+  },
+  {
+    ring: 'images/Ring/ring_15-ayodance-peppermint.png',
+    letter: "images/LP Love Letter ♡/Chapter 14 - Peppermint - 22.04.2025.jpg",
+    chapter: 'Chapter 14',
+    flavor: 'Peppermint',
+    date: '22.04.2025',
+  },
+  {
+    ring: 'images/Ring/ring_16-ayodance-iris.png',
+    letter: "images/LP Love Letter ♡/Chapter 15 - Iris - 29.09.2025.jpg",
+    chapter: 'Chapter 15',
+    flavor: 'Iris',
+    date: '29.09.2025',
+  },
+];
+
+const letterGalleryEl = document.getElementById('letterGallery');
+const loveLightboxEl = document.getElementById('loveLightbox');
+const lightboxImageEl = document.getElementById('lightboxImage');
+const lightboxCaptionEl = document.getElementById('lightboxCaption');
+const lightboxCloseBtn = document.getElementById('lightboxClose');
+
+let lastLetterTrigger = null;
+
+function buildLetterCaption(letter) {
+  return `${letter.chapter} - ${letter.flavor} - ${letter.date}`;
+}
+
+function openLoveLetter(index, trigger) {
+  const letter = loveLetters[index];
+  if (!letter || !loveLightboxEl) {
+    return;
+  }
+  lastLetterTrigger = trigger || null;
+  if (lightboxImageEl) {
+    lightboxImageEl.src = letter.letter;
+    lightboxImageEl.alt = `${buildLetterCaption(letter)} love letter`;
+  }
+  if (lightboxCaptionEl) {
+    lightboxCaptionEl.textContent = buildLetterCaption(letter);
+  }
+  loveLightboxEl.classList.add('is-visible');
+  loveLightboxEl.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  if (lightboxCloseBtn) {
+    lightboxCloseBtn.focus();
+  }
+}
+
+function closeLoveLetter() {
+  if (!loveLightboxEl) {
+    return;
+  }
+  loveLightboxEl.classList.remove('is-visible');
+  loveLightboxEl.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  if (lightboxImageEl) {
+    lightboxImageEl.src = '';
+    lightboxImageEl.alt = '';
+  }
+  if (lightboxCaptionEl) {
+    lightboxCaptionEl.textContent = '';
+  }
+  if (lastLetterTrigger) {
+    lastLetterTrigger.focus();
+  }
+  lastLetterTrigger = null;
+}
+
+function renderLoveLetters() {
+  if (!letterGalleryEl) {
+    return;
+  }
+  letterGalleryEl.innerHTML = loveLetters
+    .map((letter, index) => {
+      const ringNumber = String(index + 1).padStart(2, '0');
+      const ringLabel = `Ring ${ringNumber} — ${letter.flavor}`;
+      return `
+        <article class="love-card" role="listitem">
+          <div class="love-card__ring">
+            <img src="${letter.ring}" alt="${ringLabel}" loading="lazy" />
+          </div>
+          <div class="love-card__meta">
+            <div class="love-card__title">${ringLabel}</div>
+            <div class="love-card__subtitle">${letter.chapter} • ${letter.date}</div>
+          </div>
+          <button type="button" class="love-card__button" data-letter-index="${index}" aria-haspopup="dialog">
+            Read Chapter
+          </button>
+        </article>
+      `;
+    })
+    .join('');
+
+  const buttons = letterGalleryEl.querySelectorAll('[data-letter-index]');
+  buttons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const index = Number.parseInt(button.dataset.letterIndex, 10);
+      if (Number.isNaN(index)) {
+        return;
+      }
+      openLoveLetter(index, button);
+    });
+  });
+}
+
+renderLoveLetters();
+
+if (loveLightboxEl) {
+  loveLightboxEl.addEventListener('click', (event) => {
+    if (event.target === loveLightboxEl) {
+      closeLoveLetter();
+    }
+  });
+}
+
+if (lightboxCloseBtn) {
+  lightboxCloseBtn.addEventListener('click', closeLoveLetter);
+}
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && loveLightboxEl && loveLightboxEl.classList.contains('is-visible')) {
+    closeLoveLetter();
+  }
+});
 
 // Timeline data (edit dates/labels)
 const timelineData = [
