@@ -83,22 +83,26 @@
       <!-- LETTERS -->
       <section id="letters">
         <div class="container reveal">
-          <div class="letters">
-            <div class="letter card">
-              <h3 style="margin: 0 0 6px">Letter 1</h3>
-              <p>I love you in the little ways: saving you the last bite, remembering your favorite songs, and cheering for you on quiet days.</p>
+          <div class="letters-shell card">
+            <div class="letters-header">
+              <h2>Letters of Our Forever</h2>
+              <p>
+                Each chapter pairs the promise of a ring with a handwritten love letter. Tap a jewel to open its matching
+                chapter and let the words wrap around you.
+              </p>
             </div>
-            <div class="letter card">
-              <h3 style="margin: 0 0 6px">Letter 2</h3>
-              <p>Even on tough days, I choose you. A thousand times over. In every timeline.</p>
-            </div>
-            <div class="letter card">
-              <h3 style="margin: 0 0 6px">Letter 3</h3>
-              <p>Let’s keep building our tiny universe — one coffee, one cuddle, one adventure at a time.</p>
-            </div>
+            <div class="letter-gallery" id="letterGallery" role="list"></div>
           </div>
         </div>
       </section>
+
+      <div class="love-lightbox" id="loveLightbox" aria-hidden="true" tabindex="-1">
+        <div class="love-lightbox__content" role="dialog" aria-modal="true" aria-labelledby="lightboxCaption">
+          <button type="button" class="love-lightbox__close" id="lightboxClose" aria-label="Close letter"></button>
+          <img id="lightboxImage" alt="" class="love-lightbox__image" />
+          <div class="love-lightbox__caption" id="lightboxCaption"></div>
+        </div>
+      </div>
 
       <!-- QUOTES -->
       <section id="quotes">
