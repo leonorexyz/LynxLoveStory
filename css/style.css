@@ -892,6 +892,18 @@ p {
   color: #d63384;
 }
 
+.player-track.is-unavailable button {
+  background: rgba(255, 255, 255, 0.28);
+  color: rgba(122, 90, 107, 0.6);
+  cursor: not-allowed;
+}
+
+.player-track.is-unavailable button:hover {
+  background: rgba(255, 255, 255, 0.28);
+  transform: none;
+  color: rgba(122, 90, 107, 0.6);
+}
+
 .player.is-playing .player-disc {
   animation-play-state: running;
 }
