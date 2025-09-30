@@ -3,9 +3,33 @@
 const PIN_CODE = '200125'; // required 6-digit pin
 const PLAYLIST = [
   // Add new songs or reorder existing ones here to adjust the playlist sequence.
+  { id: '06-XXOTP3Gc', title: 'Shane Filan - Beautiful in White'},
   { id: 'OT5msu-dap8', title: 'Backstreet Boys - Shape of My Heart' },
-  { id: '8MG--WuNW1Y', title: 'Wei Bird - Red Scarf' },
+  { id: 'Qy7z_oiN6nQ', title: 'George Benson - Nothing\'s Gonna Change My Love For You' },
+  { id: 'DXvMT_mVbqw', title: 'K-Ci & JoJo - All My Life' },
+  { id: 'KNZH-emehxA', title: 'd4vd - Here With Me' },
+  { id: 'Ip6cw8gfHHI', title: 'Shania Twain - You\'re Still The One' },
+  { id: 'HeK1zQFJtXE', title: 'Tamia - Officially Missing You' },
+  { id: '8MG--WuNW1Y', title: 'Wei Bird - 如果可以' },
+  { id: 'S_E2EHVxNAE', title: 'Richard Marx - Right Here Waiting' },
+  { id: 'Ju8Hr50Ckwk', title: 'Alicia Keys - If I Ain\'t Got You' },
+  { id: 'iBrOFd1wDuQ', title: '羅志祥 - 愛不單行' },
+  { id: 'd4_QuMkOdCI', title: 'Eric Clapton - Wonderful Tonight' },
+  { id: 'XJ1Jigjg1wo', title: 'Ardhito Pramono - Waking Up Together With You' },
+  { id: 'Xct1EdyHMWw', title: 'Yahya - keepyousafe' },
   { id: '5W0UH4VbptE', title: 'PK Haeman - Evergreen Part 2' },
+  { id: '7KVxjQUCyn0', title: 'Mariah Carey, Joe, 98 Degrees - Thank God I Found You' },
+  { id: '7KVxjQUCyn0', title: 'Mariah Carey, Joe, 98 Degrees - Thank God I Found You' },
+  { id: 'ulOb9gIGGd0', title: 'Westlife - My Love' },
+  { id: '2VInZQdh1eY', title: 'M2M - Pretty Boy' },
+  { id: 'psN0NH8IcbQ', title: 'Brian McKnight - Back At One' },
+  { id: 'IlrXHkPvn8I', title: 'Celine Dion - Because You Loved Me' },
+  { id: 'ZnOAK04tJhc', title: 'Westlife - I Lay My Love on You' },
+  { id: 'K1uNjmxJQUo', title: 'The Pussycat Dolls - Stickwitu' },
+  { id: '1WCIrw85zbQ', title: 'Westlife - I Wanna Grow Old with You' },
+  { id: 'KnJfMzsyDS0', title: 'Inquisitive feat. Hannah Ying - 不得不爱' },
+  { id: 'WCM_eSgaK6o', title: 'Vic Chou - Make a Wish' },
+  { id: 'IvRQBrOY6Bk', title: '김동률 - 취중진담' },
 ];
 
 const loveLetters = [
