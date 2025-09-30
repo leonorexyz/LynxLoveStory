@@ -491,6 +491,7 @@ const playlistEl = document.getElementById('playlist');
 
 let isPlaying = false;
 let currentTrackIndex = 0;
+const unavailableTrackIndexes = new Set();
 
 let ytPlayer = null;
 let youTubeScriptRequested = false;
@@ -582,6 +583,7 @@ function createYouTubePlayer() {
         }
       },
       onStateChange: handlePlayerStateChange,
+      onError: handlePlayerError,
     },
   });
 }
@@ -618,6 +620,35 @@ function highlightActiveTrack() {
   tracks.forEach((item, index) => {
     item.classList.toggle('is-active', index === currentTrackIndex);
   });
+}
+
+function updateUnavailableTrackUI(index) {
+  if (!playlistEl) {
+    return;
+  }
+  const button = playlistEl.querySelector(`button[data-index="${index}"]`);
+  if (!button) {
+    return;
+  }
+  const listItem = button.closest('.player-track');
+  const isUnavailable = unavailableTrackIndexes.has(index);
+  button.disabled = isUnavailable;
+  if (listItem) {
+    listItem.classList.toggle('is-unavailable', isUnavailable);
+  }
+}
+
+function findNextPlayableIndex(startIndex, direction = 1) {
+  if (!PLAYLIST.length) {
+    return null;
+  }
+  for (let step = 1; step <= PLAYLIST.length; step += 1) {
+    const nextIndex = (startIndex + direction * step + PLAYLIST.length) % PLAYLIST.length;
+    if (!unavailableTrackIndexes.has(nextIndex)) {
+      return nextIndex;
+    }
+  }
+  return null;
 }
 
 function escapeHtml(text = '') {
@@ -657,9 +688,11 @@ function renderPlaylist() {
   }
   playlistEl.innerHTML = PLAYLIST.map((track, index) => {
     const number = String(index + 1).padStart(2, '0');
+    const isActive = index === currentTrackIndex;
+    const isUnavailable = unavailableTrackIndexes.has(index);
     return `
-      <li class="player-track${index === currentTrackIndex ? ' is-active' : ''}">
-        <button type="button" data-index="${index}">
+      <li class="player-track${isActive ? ' is-active' : ''}${isUnavailable ? ' is-unavailable' : ''}">
+        <button type="button" data-index="${index}"${isUnavailable ? ' disabled' : ''}>
           <span class="track-index">${number}</span>
           <span class="track-title">${escapeHtml(track.title)}</span>
         </button>
@@ -702,7 +735,20 @@ function selectTrack(index, { autoplay = true } = {}) {
   if (!PLAYLIST[index]) {
     return;
   }
-  currentTrackIndex = index;
+  let targetIndex = index;
+  if (unavailableTrackIndexes.has(targetIndex)) {
+    const fallbackIndex = findNextPlayableIndex(targetIndex, 1);
+    if (fallbackIndex === null) {
+      isPlaying = false;
+      updatePlayerUI();
+      if (playerStatus) {
+        playerStatus.textContent = 'No playable tracks available';
+      }
+      return;
+    }
+    targetIndex = fallbackIndex;
+  }
+  currentTrackIndex = targetIndex;
   isPlaying = Boolean(autoplay);
   updatePlayerUI();
   ensureYouTubePlayer().then((player) => {
@@ -736,6 +782,34 @@ function initMusicAfterGesture() {
   selectTrack(currentTrackIndex, { autoplay: true });
 }
 
+function markTrackUnavailable(index) {
+  if (!PLAYLIST[index]) {
+    return;
+  }
+  unavailableTrackIndexes.add(index);
+  updateUnavailableTrackUI(index);
+}
+
+function handlePlayerError() {
+  if (!PLAYLIST.length) {
+    return;
+  }
+  markTrackUnavailable(currentTrackIndex);
+  const nextIndex = findNextPlayableIndex(currentTrackIndex, 1);
+  if (nextIndex === null) {
+    isPlaying = false;
+    updatePlayerUI();
+    if (playerStatus) {
+      playerStatus.textContent = 'No playable tracks available';
+    }
+    return;
+  }
+  if (playerStatus) {
+    playerStatus.textContent = 'Skipping unavailable song…';
+  }
+  selectTrack(nextIndex, { autoplay: true });
+}
+
 renderPlaylist();
 updatePlayerUI();
 
@@ -757,7 +831,10 @@ if (prevBtn) {
     if (!PLAYLIST.length) {
       return;
     }
-    const nextIndex = (currentTrackIndex - 1 + PLAYLIST.length) % PLAYLIST.length;
+    const nextIndex = findNextPlayableIndex(currentTrackIndex, -1);
+    if (nextIndex === null) {
+      return;
+    }
     const shouldAutoplay = isPlaying;
     selectTrack(nextIndex, { autoplay: shouldAutoplay });
   });
@@ -768,7 +845,10 @@ if (nextBtn) {
     if (!PLAYLIST.length) {
       return;
     }
-    const nextIndex = (currentTrackIndex + 1) % PLAYLIST.length;
+    const nextIndex = findNextPlayableIndex(currentTrackIndex, 1);
+    if (nextIndex === null) {
+      return;
+    }
     const shouldAutoplay = isPlaying;
     selectTrack(nextIndex, { autoplay: shouldAutoplay });
   });
@@ -782,6 +862,9 @@ if (playlistEl) {
     }
     const index = Number.parseInt(button.dataset.index, 10);
     if (Number.isNaN(index)) {
+      return;
+    }
+    if (unavailableTrackIndexes.has(index)) {
       return;
     }
     selectTrack(index, { autoplay: true });
