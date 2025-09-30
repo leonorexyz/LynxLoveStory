@@ -123,26 +123,33 @@
       </section>
 
       <div class="love-lightbox" id="loveLightbox" aria-hidden="true" tabindex="-1">
-        <div class="love-lightbox__content" role="dialog" aria-modal="true" aria-labelledby="lightboxCaption">
-          <button type="button" class="love-lightbox__close" id="lightboxClose" aria-label="Close letter"></button>
-          <div class="love-lightbox__viewer">
-            <button
-              type="button"
-              class="love-lightbox__nav love-lightbox__nav--prev"
-              id="lightboxPrev"
-              aria-label="View previous letter"
-            ></button>
+      <div class="love-lightbox__content" role="dialog" aria-modal="true" aria-labelledby="lightboxCaption">
+        <button type="button" class="love-lightbox__close" id="lightboxClose" aria-label="Close letter"></button>
+        <div class="love-lightbox__viewer">
+          <button
+            type="button"
+            class="love-lightbox__nav love-lightbox__nav--prev"
+            id="lightboxPrev"
+            aria-label="View previous letter"
+          ></button>
+          <div class="love-lightbox__stage" id="lightboxStage">
             <img id="lightboxImage" alt="" class="love-lightbox__image" />
-            <button
-              type="button"
-              class="love-lightbox__nav love-lightbox__nav--next"
-              id="lightboxNext"
-              aria-label="View next letter"
-            ></button>
           </div>
-          <div class="love-lightbox__caption" id="lightboxCaption"></div>
+          <button
+            type="button"
+            class="love-lightbox__nav love-lightbox__nav--next"
+            id="lightboxNext"
+            aria-label="View next letter"
+          ></button>
         </div>
+        <div class="love-lightbox__toolbar" role="group" aria-label="Zoom controls">
+          <button type="button" id="lightboxZoomOut" class="love-lightbox__zoom" aria-label="Zoom out">−</button>
+          <button type="button" id="lightboxZoomReset" class="love-lightbox__zoom" aria-label="Reset zoom">↺</button>
+          <button type="button" id="lightboxZoomIn" class="love-lightbox__zoom" aria-label="Zoom in">＋</button>
+        </div>
+        <div class="love-lightbox__caption" id="lightboxCaption"></div>
       </div>
+    </div>
 
       <div class="love-lightbox love-lightbox--photo" id="aboutLightbox" aria-hidden="true" tabindex="-1">
         <div class="love-lightbox__content" role="dialog" aria-modal="true" aria-label="Full size photo">
@@ -190,6 +197,10 @@
       <div class="player-list-header">Playlist</div>
       <ul class="player-playlist" id="playlist"></ul>
     </div>
+
+    <button type="button" class="scroll-top" id="scrollTopBtn" aria-label="Scroll back to top">
+      <span aria-hidden="true">↑</span>
+    </button>
 
     <script src="js/main.js"></script>
   </body>
