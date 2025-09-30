@@ -3,12 +3,12 @@
 const PIN_CODE = '200125'; // required 6-digit pin
 const PLAYLIST = [
   // Add new songs or reorder existing ones here to adjust the playlist sequence.
-  { id: '3m48GON4VU0', title: 'Shane Filan - Beautiful in White'},
+  { id: '06-XXOTP3Gc', title: 'Shane Filan - Beautiful in White'},
   { id: 'OT5msu-dap8', title: 'Backstreet Boys - Shape of My Heart' },
   { id: 'Qy7z_oiN6nQ', title: "George Benson - Nothing's Gonna Change My Love For You" },
   { id: 'DXvMT_mVbqw', title: 'K-Ci & JoJo - All My Life' },
-  { id: 'KNZH-emehxA', title: 'd4vd - Here With Me' },
-  { id: 'Ip6cw8gfHHI', title: 'Shania Twain - You\'re Still The One' },
+  { id: 'Ip6cw8gfHHI', title: 'd4vd - Here With Me' },
+  { id: 'KNZH-emehxA', title: 'Shania Twain - You\'re Still The One' },
   { id: 'HeK1zQFJtXE', title: 'Tamia - Officially Missing You' },
   { id: '8MG--WuNW1Y', title: 'Wei Bird - 如果可以' },
   { id: 'S_E2EHVxNAE', title: 'Richard Marx - Right Here Waiting' },
