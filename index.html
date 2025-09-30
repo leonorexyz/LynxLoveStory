@@ -125,7 +125,21 @@
       <div class="love-lightbox" id="loveLightbox" aria-hidden="true" tabindex="-1">
         <div class="love-lightbox__content" role="dialog" aria-modal="true" aria-labelledby="lightboxCaption">
           <button type="button" class="love-lightbox__close" id="lightboxClose" aria-label="Close letter"></button>
-          <img id="lightboxImage" alt="" class="love-lightbox__image" />
+          <div class="love-lightbox__viewer">
+            <button
+              type="button"
+              class="love-lightbox__nav love-lightbox__nav--prev"
+              id="lightboxPrev"
+              aria-label="View previous letter"
+            ></button>
+            <img id="lightboxImage" alt="" class="love-lightbox__image" />
+            <button
+              type="button"
+              class="love-lightbox__nav love-lightbox__nav--next"
+              id="lightboxNext"
+              aria-label="View next letter"
+            ></button>
+          </div>
           <div class="love-lightbox__caption" id="lightboxCaption"></div>
         </div>
       </div>

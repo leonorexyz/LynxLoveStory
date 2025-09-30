@@ -151,6 +151,8 @@ const loveLightboxEl = document.getElementById('loveLightbox');
 const lightboxImageEl = document.getElementById('lightboxImage');
 const lightboxCaptionEl = document.getElementById('lightboxCaption');
 const lightboxCloseBtn = document.getElementById('lightboxClose');
+const lightboxPrevBtn = document.getElementById('lightboxPrev');
+const lightboxNextBtn = document.getElementById('lightboxNext');
 const aboutImageTriggers = document.querySelectorAll('.about-img-trigger');
 const aboutLightboxEl = document.getElementById('aboutLightbox');
 const aboutLightboxImageEl = document.getElementById('aboutLightboxImage');
@@ -158,6 +160,7 @@ const aboutLightboxCloseBtn = document.getElementById('aboutLightboxClose');
 
 let lastLetterTrigger = null;
 let lastAboutTrigger = null;
+let currentLetterIndex = -1;
 
 function restoreBodyScroll() {
   const loveOpen = loveLightboxEl?.classList.contains('is-visible');
@@ -171,12 +174,23 @@ function buildLetterCaption(letter) {
   return `${letter.chapter} - ${letter.flavor} - ${letter.date}`;
 }
 
-function openLoveLetter(index, trigger) {
-  const letter = loveLetters[index];
-  if (!letter || !loveLightboxEl) {
-    return;
+function updateLightboxNavButtons() {
+  const shouldDisable = loveLetters.length <= 1 || currentLetterIndex < 0;
+  if (lightboxPrevBtn) {
+    lightboxPrevBtn.disabled = shouldDisable;
+    lightboxPrevBtn.setAttribute('aria-hidden', shouldDisable ? 'true' : 'false');
   }
-  lastLetterTrigger = trigger || null;
+  if (lightboxNextBtn) {
+    lightboxNextBtn.disabled = shouldDisable;
+    lightboxNextBtn.setAttribute('aria-hidden', shouldDisable ? 'true' : 'false');
+  }
+}
+
+function setLoveLightboxContent(index) {
+  const letter = loveLetters[index];
+  if (!letter) {
+    return false;
+  }
   if (lightboxImageEl) {
     lightboxImageEl.src = letter.letter;
     lightboxImageEl.alt = `${buildLetterCaption(letter)} love letter`;
@@ -184,6 +198,19 @@ function openLoveLetter(index, trigger) {
   if (lightboxCaptionEl) {
     lightboxCaptionEl.textContent = buildLetterCaption(letter);
   }
+  currentLetterIndex = index;
+  updateLightboxNavButtons();
+  return true;
+}
+
+function openLoveLetter(index, trigger) {
+  if (!loveLightboxEl) {
+    return;
+  }
+  if (!setLoveLightboxContent(index)) {
+    return;
+  }
+  lastLetterTrigger = trigger || null;
   loveLightboxEl.classList.add('is-visible');
   loveLightboxEl.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
@@ -206,10 +233,21 @@ function closeLoveLetter() {
   if (lightboxCaptionEl) {
     lightboxCaptionEl.textContent = '';
   }
+  currentLetterIndex = -1;
+  updateLightboxNavButtons();
   if (lastLetterTrigger) {
     lastLetterTrigger.focus();
   }
   lastLetterTrigger = null;
+}
+
+function moveLoveLetter(step) {
+  if (currentLetterIndex < 0 || !loveLetters.length) {
+    return;
+  }
+  const total = loveLetters.length;
+  const nextIndex = (currentLetterIndex + step + total) % total;
+  setLoveLightboxContent(nextIndex);
 }
 
 function openAboutLightbox(trigger) {
@@ -331,6 +369,14 @@ if (lightboxCloseBtn) {
   lightboxCloseBtn.addEventListener('click', closeLoveLetter);
 }
 
+if (lightboxPrevBtn) {
+  lightboxPrevBtn.addEventListener('click', () => moveLoveLetter(-1));
+}
+
+if (lightboxNextBtn) {
+  lightboxNextBtn.addEventListener('click', () => moveLoveLetter(1));
+}
+
 if (aboutImageTriggers.length) {
   aboutImageTriggers.forEach((trigger) => {
     trigger.addEventListener('click', () => openAboutLightbox(trigger));
@@ -350,16 +396,30 @@ if (aboutLightboxCloseBtn) {
 }
 
 document.addEventListener('keydown', (event) => {
-  if (event.key !== 'Escape') {
+  const loveLightboxVisible = loveLightboxEl && loveLightboxEl.classList.contains('is-visible');
+  const aboutLightboxVisible = aboutLightboxEl && aboutLightboxEl.classList.contains('is-visible');
+  if (event.key === 'Escape') {
+    if (loveLightboxVisible) {
+      closeLoveLetter();
+    }
+    if (aboutLightboxVisible) {
+      closeAboutLightbox();
+    }
     return;
   }
-  if (loveLightboxEl && loveLightboxEl.classList.contains('is-visible')) {
-    closeLoveLetter();
+  if (!loveLightboxVisible) {
+    return;
   }
-  if (aboutLightboxEl && aboutLightboxEl.classList.contains('is-visible')) {
-    closeAboutLightbox();
+  if (event.key === 'ArrowRight') {
+    event.preventDefault();
+    moveLoveLetter(1);
+  } else if (event.key === 'ArrowLeft') {
+    event.preventDefault();
+    moveLoveLetter(-1);
   }
 });
+
+updateLightboxNavButtons();
 
 const typewriterEls = document.querySelectorAll('[data-typewriter]');
 let typewriterStarted = false;
@@ -391,10 +451,14 @@ function animateTypewriter(el) {
   const speedValue = Number.parseInt(el.dataset.typewriterSpeed || '', 10);
   const delayValue = Number.parseInt(el.dataset.typewriterDelay || '', 10) || 0;
   const step = Number.isFinite(speedValue) && speedValue > 0 ? speedValue : 90;
+  const loopDelayValue = Number.parseInt(el.dataset.typewriterLoopDelay || '', 10);
+  const fallbackLoopDelay = Math.max(1600, Math.round(text.length * step * 0.8));
+  const loopDelay = Number.isFinite(loopDelayValue) && loopDelayValue >= 0 ? loopDelayValue : fallbackLoopDelay;
+  const shouldLoop = el.dataset.typewriterLoop !== 'false';
   el.classList.remove('is-complete');
-  el.textContent = '';
   const startTyping = () => {
     let index = 0;
+    el.textContent = '';
     const typeNext = () => {
       el.textContent = text.slice(0, index + 1);
       index += 1;
@@ -403,6 +467,14 @@ function animateTypewriter(el) {
       } else {
         el.textContent = text;
         el.classList.add('is-complete');
+        if (shouldLoop) {
+          setTimeout(() => {
+            if (!document.body.contains(el)) {
+              return;
+            }
+            animateTypewriter(el);
+          }, loopDelay);
+        }
       }
     };
     typeNext();
