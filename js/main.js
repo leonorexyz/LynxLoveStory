@@ -185,7 +185,7 @@ function renderLoveLetters() {
       const ringNumber = String(index + 1).padStart(2, '0');
       const ringLabel = `Ring ${ringNumber} — ${letter.flavor}`;
       return `
-        <article class="love-card" role="listitem">
+        <article class="love-card" role="listitem" data-letter-index="${index}" tabindex="0" aria-label="Open ${ringLabel} love letter">
           <div class="love-card__ring">
             <img src="${letter.ring}" alt="${ringLabel}" loading="lazy" />
           </div>
@@ -200,16 +200,46 @@ function renderLoveLetters() {
       `;
     })
     .join('');
+}
 
-  const buttons = letterGalleryEl.querySelectorAll('[data-letter-index]');
-  buttons.forEach((button) => {
-    button.addEventListener('click', () => {
-      const index = Number.parseInt(button.dataset.letterIndex, 10);
-      if (Number.isNaN(index)) {
-        return;
-      }
-      openLoveLetter(index, button);
-    });
+function findLetterTrigger(eventTarget) {
+  if (!(eventTarget instanceof HTMLElement)) {
+    return null;
+  }
+  const trigger = eventTarget.closest('[data-letter-index]');
+  if (!trigger) {
+    return null;
+  }
+  const index = Number.parseInt(trigger.dataset.letterIndex || '', 10);
+  if (Number.isNaN(index)) {
+    return null;
+  }
+  return { index, trigger };
+}
+
+if (letterGalleryEl) {
+  letterGalleryEl.addEventListener('click', (event) => {
+    const found = findLetterTrigger(event.target);
+    if (!found) {
+      return;
+    }
+    openLoveLetter(found.index, found.trigger);
+  });
+
+  letterGalleryEl.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
+    const card = event.target instanceof HTMLElement ? event.target.closest('.love-card') : null;
+    if (!card) {
+      return;
+    }
+    const index = Number.parseInt(card.dataset.letterIndex || '', 10);
+    if (Number.isNaN(index)) {
+      return;
+    }
+    event.preventDefault();
+    openLoveLetter(index, card);
   });
 }
 
