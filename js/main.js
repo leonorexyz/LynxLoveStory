@@ -153,14 +153,31 @@ const lightboxCaptionEl = document.getElementById('lightboxCaption');
 const lightboxCloseBtn = document.getElementById('lightboxClose');
 const lightboxPrevBtn = document.getElementById('lightboxPrev');
 const lightboxNextBtn = document.getElementById('lightboxNext');
+const lightboxStageEl = document.getElementById('lightboxStage');
+const lightboxZoomOutBtn = document.getElementById('lightboxZoomOut');
+const lightboxZoomResetBtn = document.getElementById('lightboxZoomReset');
+const lightboxZoomInBtn = document.getElementById('lightboxZoomIn');
 const aboutImageTriggers = document.querySelectorAll('.about-img-trigger');
 const aboutLightboxEl = document.getElementById('aboutLightbox');
 const aboutLightboxImageEl = document.getElementById('aboutLightboxImage');
 const aboutLightboxCloseBtn = document.getElementById('aboutLightboxClose');
+const scrollTopBtn = document.getElementById('scrollTopBtn');
 
 let lastLetterTrigger = null;
 let lastAboutTrigger = null;
 let currentLetterIndex = -1;
+let lightboxZoomLevel = 1;
+let lightboxPanX = 0;
+let lightboxPanY = 0;
+let lightboxDragPointerId = null;
+let isDraggingLightboxImage = false;
+let dragStartX = 0;
+let dragStartY = 0;
+const LIGHTBOX_MIN_ZOOM = 1;
+const LIGHTBOX_MAX_ZOOM = 3.2;
+const LIGHTBOX_ZOOM_STEP = 0.25;
+const reduceMotionQuery = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+let prefersReducedMotion = Boolean(reduceMotionQuery?.matches);
 
 function restoreBodyScroll() {
   const loveOpen = loveLightboxEl?.classList.contains('is-visible');
@@ -186,11 +203,183 @@ function updateLightboxNavButtons() {
   }
 }
 
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function updateZoomButtonState() {
+  const nearMin = lightboxZoomLevel <= LIGHTBOX_MIN_ZOOM + 0.01;
+  const nearMax = lightboxZoomLevel >= LIGHTBOX_MAX_ZOOM - 0.01;
+  if (lightboxZoomOutBtn) {
+    lightboxZoomOutBtn.disabled = nearMin;
+  }
+  if (lightboxZoomResetBtn) {
+    lightboxZoomResetBtn.disabled = nearMin;
+  }
+  if (lightboxZoomInBtn) {
+    lightboxZoomInBtn.disabled = nearMax;
+  }
+}
+
+function syncLightboxZoomClasses() {
+  const zoomed = lightboxZoomLevel > LIGHTBOX_MIN_ZOOM + 0.01;
+  if (lightboxStageEl) {
+    lightboxStageEl.classList.toggle('is-zoomed', zoomed);
+    if (!zoomed) {
+      lightboxStageEl.classList.remove('is-grabbing');
+    }
+  }
+  if (lightboxImageEl) {
+    lightboxImageEl.classList.toggle('is-zoomed', zoomed);
+  }
+}
+
+function applyLightboxTransform() {
+  if (!lightboxImageEl) {
+    return;
+  }
+  lightboxImageEl.style.transform = `translate(${lightboxPanX}px, ${lightboxPanY}px) scale(${lightboxZoomLevel})`;
+  syncLightboxZoomClasses();
+  updateZoomButtonState();
+}
+
+function constrainLightboxPan() {
+  if (!lightboxStageEl || lightboxZoomLevel <= LIGHTBOX_MIN_ZOOM) {
+    lightboxPanX = 0;
+    lightboxPanY = 0;
+    return;
+  }
+  const rect = lightboxStageEl.getBoundingClientRect();
+  if (!rect.width || !rect.height) {
+    return;
+  }
+  const limitX = ((rect.width * lightboxZoomLevel) - rect.width) / 2;
+  const limitY = ((rect.height * lightboxZoomLevel) - rect.height) / 2;
+  const maxX = Math.max(limitX, 0) + 24;
+  const maxY = Math.max(limitY, 0) + 24;
+  lightboxPanX = clamp(lightboxPanX, -maxX, maxX);
+  lightboxPanY = clamp(lightboxPanY, -maxY, maxY);
+}
+
+function resetLightboxZoomState() {
+  if (isDraggingLightboxImage) {
+    endLightboxDrag();
+  }
+  lightboxZoomLevel = LIGHTBOX_MIN_ZOOM;
+  lightboxPanX = 0;
+  lightboxPanY = 0;
+  lightboxDragPointerId = null;
+  isDraggingLightboxImage = false;
+  if (lightboxStageEl) {
+    lightboxStageEl.classList.remove('is-grabbing');
+  }
+  applyLightboxTransform();
+}
+
+function setLightboxZoom(level, { focusX, focusY } = {}) {
+  const newZoom = clamp(level, LIGHTBOX_MIN_ZOOM, LIGHTBOX_MAX_ZOOM);
+  if (Math.abs(newZoom - lightboxZoomLevel) < 0.01) {
+    return;
+  }
+  if (lightboxStageEl) {
+    const rect = lightboxStageEl.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const originX = typeof focusX === 'number' ? focusX : centerX;
+      const originY = typeof focusY === 'number' ? focusY : centerY;
+      const offsetX = originX - centerX;
+      const offsetY = originY - centerY;
+      if (lightboxZoomLevel > LIGHTBOX_MIN_ZOOM || newZoom > LIGHTBOX_MIN_ZOOM) {
+        const ratio = newZoom / lightboxZoomLevel;
+        lightboxPanX = (lightboxPanX + offsetX) * ratio - offsetX;
+        lightboxPanY = (lightboxPanY + offsetY) * ratio - offsetY;
+      }
+    }
+  }
+  lightboxZoomLevel = newZoom;
+  if (lightboxZoomLevel === LIGHTBOX_MIN_ZOOM) {
+    lightboxPanX = 0;
+    lightboxPanY = 0;
+  }
+  constrainLightboxPan();
+  applyLightboxTransform();
+}
+
+function changeLightboxZoom(delta, options) {
+  setLightboxZoom(lightboxZoomLevel + delta, options);
+}
+
+function endLightboxDrag() {
+  if (!isDraggingLightboxImage) {
+    return;
+  }
+  isDraggingLightboxImage = false;
+  if (lightboxStageEl && lightboxDragPointerId !== null) {
+    lightboxStageEl.releasePointerCapture(lightboxDragPointerId);
+    lightboxStageEl.classList.remove('is-grabbing');
+  }
+  lightboxDragPointerId = null;
+}
+
+function handleLightboxPointerDown(event) {
+  if (event.pointerType === 'touch') {
+    event.preventDefault();
+  }
+  if (lightboxZoomLevel <= LIGHTBOX_MIN_ZOOM || event.button === 1 || event.button === 2) {
+    return;
+  }
+  isDraggingLightboxImage = true;
+  lightboxDragPointerId = event.pointerId;
+  dragStartX = event.clientX - lightboxPanX;
+  dragStartY = event.clientY - lightboxPanY;
+  if (lightboxStageEl) {
+    lightboxStageEl.setPointerCapture(event.pointerId);
+    lightboxStageEl.classList.add('is-grabbing');
+  }
+}
+
+function handleLightboxPointerMove(event) {
+  if (!isDraggingLightboxImage || event.pointerId !== lightboxDragPointerId) {
+    return;
+  }
+  lightboxPanX = event.clientX - dragStartX;
+  lightboxPanY = event.clientY - dragStartY;
+  constrainLightboxPan();
+  applyLightboxTransform();
+}
+
+function handleLightboxWheel(event) {
+  if (!lightboxStageEl || event.ctrlKey) {
+    return;
+  }
+  if (lightboxStageEl.contains(event.target)) {
+    event.preventDefault();
+    const direction = event.deltaY < 0 ? 1 : -1;
+    const rect = lightboxStageEl.getBoundingClientRect();
+    const focusX = event.clientX - rect.left;
+    const focusY = event.clientY - rect.top;
+    changeLightboxZoom(direction * LIGHTBOX_ZOOM_STEP, { focusX, focusY });
+  }
+}
+
+function toggleLightboxZoom(event) {
+  if (lightboxZoomLevel > LIGHTBOX_MIN_ZOOM + 0.01) {
+    resetLightboxZoomState();
+  } else if (lightboxStageEl) {
+    const rect = lightboxStageEl.getBoundingClientRect();
+    const focusX = event ? event.clientX - rect.left : rect.width / 2;
+    const focusY = event ? event.clientY - rect.top : rect.height / 2;
+    setLightboxZoom(Math.min(2, LIGHTBOX_MAX_ZOOM), { focusX, focusY });
+  }
+}
+
 function setLoveLightboxContent(index) {
   const letter = loveLetters[index];
   if (!letter) {
     return false;
   }
+  resetLightboxZoomState();
   if (lightboxImageEl) {
     lightboxImageEl.src = letter.letter;
     lightboxImageEl.alt = `${buildLetterCaption(letter)} love letter`;
@@ -235,6 +424,7 @@ function closeLoveLetter() {
   }
   currentLetterIndex = -1;
   updateLightboxNavButtons();
+  resetLightboxZoomState();
   if (lastLetterTrigger) {
     lastLetterTrigger.focus();
   }
@@ -376,6 +566,33 @@ if (lightboxPrevBtn) {
 if (lightboxNextBtn) {
   lightboxNextBtn.addEventListener('click', () => moveLoveLetter(1));
 }
+
+if (lightboxZoomInBtn) {
+  lightboxZoomInBtn.addEventListener('click', () => changeLightboxZoom(LIGHTBOX_ZOOM_STEP));
+}
+
+if (lightboxZoomOutBtn) {
+  lightboxZoomOutBtn.addEventListener('click', () => changeLightboxZoom(-LIGHTBOX_ZOOM_STEP));
+}
+
+if (lightboxZoomResetBtn) {
+  lightboxZoomResetBtn.addEventListener('click', () => resetLightboxZoomState());
+}
+
+if (lightboxStageEl) {
+  lightboxStageEl.addEventListener('pointerdown', handleLightboxPointerDown);
+  lightboxStageEl.addEventListener('pointermove', handleLightboxPointerMove);
+  lightboxStageEl.addEventListener('pointerup', endLightboxDrag);
+  lightboxStageEl.addEventListener('pointercancel', endLightboxDrag);
+  lightboxStageEl.addEventListener('pointerleave', endLightboxDrag);
+  lightboxStageEl.addEventListener('wheel', handleLightboxWheel, { passive: false });
+  lightboxStageEl.addEventListener('dblclick', (event) => {
+    event.preventDefault();
+    toggleLightboxZoom(event);
+  });
+}
+
+updateZoomButtonState();
 
 if (aboutImageTriggers.length) {
   aboutImageTriggers.forEach((trigger) => {
@@ -527,6 +744,7 @@ function unlockSite() {
   startTypewriterAnimations();
   initMusicAfterGesture();
   reveal();
+  updateScrollTopButton();
   if (playerEl) {
     playerEl.style.display = 'flex';
   }
@@ -568,6 +786,7 @@ let ytPlayer = null;
 let youTubeScriptRequested = false;
 let youTubePlayerReadyResolved = false;
 let youTubePlayerReadyResolve;
+let pendingTrackSelection = null;
 
 const youTubePlayerReadyPromise = new Promise((resolve) => {
   youTubePlayerReadyResolve = (player) => {
@@ -649,9 +868,6 @@ function createYouTubePlayer() {
         if (typeof youTubePlayerReadyResolve === 'function') {
           youTubePlayerReadyResolve(event.target);
         }
-        if (isPlaying && ytPlayer && typeof ytPlayer.playVideo === 'function') {
-          ytPlayer.playVideo();
-        }
       },
       onStateChange: handlePlayerStateChange,
       onError: handlePlayerError,
@@ -671,6 +887,39 @@ function ensureYouTubePlayer() {
     createYouTubePlayer();
   }
   return youTubePlayerReadyPromise;
+}
+
+function applyTrackSelectionToPlayer(player, selection) {
+  if (!player || !PLAYLIST.length || !selection) {
+    return;
+  }
+  const { index, autoplay } = selection;
+  const track = PLAYLIST[index];
+  if (!track) {
+    return;
+  }
+  if (autoplay) {
+    player.loadVideoById(track.id);
+    if (typeof player.playVideo === 'function') {
+      player.playVideo();
+    }
+  } else if (typeof player.cueVideoById === 'function') {
+    player.cueVideoById(track.id);
+  } else {
+    player.loadVideoById(track.id);
+    if (typeof player.pauseVideo === 'function') {
+      player.pauseVideo();
+    }
+  }
+}
+
+function flushPendingTrackSelection(player) {
+  if (!player || !PLAYLIST.length) {
+    return;
+  }
+  const selection = pendingTrackSelection || { index: currentTrackIndex, autoplay: isPlaying };
+  pendingTrackSelection = null;
+  applyTrackSelectionToPlayer(player, selection);
 }
 
 window.onYouTubeIframeAPIReady = () => {
@@ -846,27 +1095,9 @@ function selectTrack(index, { autoplay = true } = {}) {
   currentTrackIndex = targetIndex;
   isPlaying = Boolean(autoplay);
   updatePlayerUI();
+  pendingTrackSelection = { index: currentTrackIndex, autoplay: isPlaying };
   ensureYouTubePlayer().then((player) => {
-    if (!player) {
-      return;
-    }
-    const track = PLAYLIST[currentTrackIndex];
-    if (!track) {
-      return;
-    }
-    if (autoplay) {
-      player.loadVideoById(track.id);
-      if (typeof player.playVideo === 'function') {
-        player.playVideo();
-      }
-    } else if (typeof player.cueVideoById === 'function') {
-      player.cueVideoById(track.id);
-    } else {
-      player.loadVideoById(track.id);
-      if (typeof player.pauseVideo === 'function') {
-        player.pauseVideo();
-      }
-    }
+    flushPendingTrackSelection(player);
   });
 }
 
@@ -967,25 +1198,61 @@ if (playlistEl) {
 
 // ======= Smooth reveal on scroll =======
 const revealEls = document.querySelectorAll('.reveal');
-const io = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((ent) => {
-      if (ent.isIntersecting) {
-        ent.target.classList.add('show');
-        io.unobserve(ent.target);
-      }
-    });
-  },
-  { threshold: 0.2 }
-);
-revealEls.forEach((el) => io.observe(el));
+let revealObserver = null;
 
 function reveal() {
+  if (prefersReducedMotion) {
+    return;
+  }
+  if (!revealObserver) {
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+    revealEls.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      const isVisible = rect.top < viewportHeight * 0.9 && rect.bottom > viewportHeight * 0.08;
+      el.classList.toggle('is-visible', isVisible);
+      el.classList.toggle('is-hidden', !isVisible);
+    });
+  }
+}
+
+if (!prefersReducedMotion && typeof IntersectionObserver === 'function') {
+  revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          entry.target.classList.remove('is-hidden');
+        } else {
+          entry.target.classList.remove('is-visible');
+          entry.target.classList.add('is-hidden');
+        }
+      });
+    },
+    { threshold: 0.25, rootMargin: '0px 0px -10% 0px' }
+  );
   revealEls.forEach((el) => {
-    const r = el.getBoundingClientRect();
-    if (r.top < window.innerHeight - 80) {
-      el.classList.add('show');
-    }
+    el.classList.add('is-hidden');
+    revealObserver.observe(el);
+  });
+} else {
+  revealEls.forEach((el) => {
+    el.classList.add('is-visible');
+    el.classList.remove('is-hidden');
+  });
+}
+
+function updateScrollTopButton() {
+  if (!scrollTopBtn) {
+    return;
+  }
+  const threshold = Math.max(window.innerHeight * 0.35, 260);
+  const shouldShow = window.scrollY > threshold;
+  scrollTopBtn.classList.toggle('is-visible', shouldShow);
+}
+
+if (scrollTopBtn) {
+  scrollTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
   });
 }
 
@@ -1028,6 +1295,27 @@ setInterval(() => {
     quoteBox.textContent = `"${quotes[qIndex]}"`;
   }, 350);
 }, 5000);
+
+window.addEventListener(
+  'scroll',
+  () => {
+    updateScrollTopButton();
+    if (!revealObserver) {
+      reveal();
+    }
+  },
+  { passive: true }
+);
+
+window.addEventListener('resize', () => {
+  updateScrollTopButton();
+  if (!revealObserver) {
+    reveal();
+  }
+});
+
+updateScrollTopButton();
+reveal();
 
 // ======= Heart particles =======
 const canvas = document.getElementById('particles');
