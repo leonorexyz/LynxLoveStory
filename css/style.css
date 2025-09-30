@@ -24,6 +24,27 @@ body {
   overflow-x: hidden;
   scroll-behavior: smooth;
   cursor: url('../images/heart_cursor.svg') 8 8, auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(214, 31, 114, 0.35) rgba(255, 255, 255, 0.45);
+}
+
+body::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: linear-gradient(160deg, rgba(214, 31, 114, 0.42), rgba(255, 105, 180, 0.6));
+  border-radius: 999px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(160deg, rgba(214, 31, 114, 0.6), rgba(255, 105, 180, 0.78));
 }
 
 a,
@@ -487,6 +508,13 @@ p {
   gap: clamp(14px, 3vw, 22px);
 }
 
+.love-lightbox__viewer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .love-lightbox__close {
   position: absolute;
   top: 14px;
@@ -525,6 +553,62 @@ p {
   border-radius: 20px;
   display: block;
   box-shadow: 0 20px 35px rgba(199, 42, 115, 0.18);
+}
+
+.love-lightbox__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(40px, 6vw, 54px);
+  height: clamp(40px, 6vw, 54px);
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(160deg, rgba(255, 102, 153, 0.95), rgba(255, 151, 188, 0.95));
+  box-shadow: 0 14px 28px rgba(214, 31, 114, 0.25);
+  cursor: url('../images/heart_cursor.svg') 8 8, pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.love-lightbox__nav::before {
+  content: '‹';
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  color: white;
+  line-height: 1;
+}
+
+.love-lightbox__nav--prev {
+  left: clamp(6px, 2vw, 20px);
+}
+
+.love-lightbox__nav--prev::before {
+  transform: rotate(0deg);
+}
+
+.love-lightbox__nav--next {
+  right: clamp(6px, 2vw, 20px);
+}
+
+.love-lightbox__nav--next::before {
+  content: '›';
+}
+
+.love-lightbox__nav:hover {
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 18px 36px rgba(214, 31, 114, 0.28);
+  background: linear-gradient(160deg, rgba(255, 120, 170, 1), rgba(255, 170, 204, 1));
+}
+
+.love-lightbox__nav:focus-visible {
+  outline: 3px solid rgba(199, 42, 115, 0.55);
+  outline-offset: 3px;
+}
+
+.love-lightbox__nav:disabled {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .love-lightbox--photo .love-lightbox__content {
