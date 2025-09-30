@@ -3,7 +3,7 @@
 const PIN_CODE = '200125'; // required 6-digit pin
 const PLAYLIST = [
   // Add new songs or reorder existing ones here to adjust the playlist sequence.
-  { id: '06-XXOTP3Gc', title: 'Shane Filan - Beautiful in White'},
+  { id: '3m48GON4VU0', title: 'Shane Filan - Beautiful in White'},
   { id: 'OT5msu-dap8', title: 'Backstreet Boys - Shape of My Heart' },
   { id: 'Qy7z_oiN6nQ', title: "George Benson - Nothing's Gonna Change My Love For You" },
   { id: 'DXvMT_mVbqw', title: 'K-Ci & JoJo - All My Life' },
