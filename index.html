@@ -148,8 +148,13 @@
 
     <footer>Crafted with ♡ — just for you. ✨</footer>
 
-    <!-- Hidden YouTube Player (src set after unlock for user-gesture autoplay compliance) -->
-    <iframe id="yt" title="Background Music" width="0" height="0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="position: absolute; left: -9999px; top: -9999px"></iframe>
+    <!-- Hidden YouTube Player container (the iframe is injected by the YouTube IFrame API) -->
+    <div
+      id="yt"
+      title="Background Music"
+      aria-hidden="true"
+      style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)"
+    ></div>
 
     <!-- Floating player control -->
     <div class="player" id="player" style="display: none">
