@@ -592,7 +592,7 @@ function ensureYouTubePlayer() {
   if (!yt) {
     return Promise.resolve(null);
   }
-  if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
+  if (ytPlayer && youTubePlayerReadyResolved && typeof ytPlayer.loadVideoById === 'function') {
     return Promise.resolve(ytPlayer);
   }
   ensureYouTubeIframeAPIScript();
