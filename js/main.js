@@ -525,6 +525,7 @@ function handlePlayerStateChange(event) {
     return;
   }
   const PlayerState = window.YT?.PlayerState;
+  const playerTarget = event?.target;
   switch (event.data) {
     case PlayerState?.ENDED: {
       const nextIndex = (currentTrackIndex + 1) % PLAYLIST.length;
@@ -543,6 +544,12 @@ function handlePlayerStateChange(event) {
         isPlaying = false;
       }
       updatePlayerUI();
+      break;
+    }
+    case PlayerState?.CUED: {
+      if (isPlaying && playerTarget && typeof playerTarget.playVideo === 'function') {
+        playerTarget.playVideo();
+      }
       break;
     }
     default:
@@ -569,6 +576,9 @@ function createYouTubePlayer() {
         ytPlayer = event.target;
         if (typeof youTubePlayerReadyResolve === 'function') {
           youTubePlayerReadyResolve(event.target);
+        }
+        if (isPlaying && ytPlayer && typeof ytPlayer.playVideo === 'function') {
+          ytPlayer.playVideo();
         }
       },
       onStateChange: handlePlayerStateChange,
@@ -705,6 +715,9 @@ function selectTrack(index, { autoplay = true } = {}) {
     }
     if (autoplay) {
       player.loadVideoById(track.id);
+      if (typeof player.playVideo === 'function') {
+        player.playVideo();
+      }
     } else if (typeof player.cueVideoById === 'function') {
       player.cueVideoById(track.id);
     } else {
@@ -720,9 +733,7 @@ function initMusicAfterGesture() {
   if (!PLAYLIST.length) {
     return;
   }
-  ensureYouTubePlayer().then(() => {
-    selectTrack(currentTrackIndex, { autoplay: true });
-  });
+  selectTrack(currentTrackIndex, { autoplay: true });
 }
 
 renderPlaylist();
