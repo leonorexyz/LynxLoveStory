@@ -128,8 +128,21 @@ const loveLightboxEl = document.getElementById('loveLightbox');
 const lightboxImageEl = document.getElementById('lightboxImage');
 const lightboxCaptionEl = document.getElementById('lightboxCaption');
 const lightboxCloseBtn = document.getElementById('lightboxClose');
+const aboutImageTriggers = document.querySelectorAll('.about-img-trigger');
+const aboutLightboxEl = document.getElementById('aboutLightbox');
+const aboutLightboxImageEl = document.getElementById('aboutLightboxImage');
+const aboutLightboxCloseBtn = document.getElementById('aboutLightboxClose');
 
 let lastLetterTrigger = null;
+let lastAboutTrigger = null;
+
+function restoreBodyScroll() {
+  const loveOpen = loveLightboxEl?.classList.contains('is-visible');
+  const aboutOpen = aboutLightboxEl?.classList.contains('is-visible');
+  if (!loveOpen && !aboutOpen) {
+    document.body.style.overflow = '';
+  }
+}
 
 function buildLetterCaption(letter) {
   return `${letter.chapter} - ${letter.flavor} - ${letter.date}`;
@@ -162,7 +175,7 @@ function closeLoveLetter() {
   }
   loveLightboxEl.classList.remove('is-visible');
   loveLightboxEl.setAttribute('aria-hidden', 'true');
-  document.body.style.overflow = '';
+  restoreBodyScroll();
   if (lightboxImageEl) {
     lightboxImageEl.src = '';
     lightboxImageEl.alt = '';
@@ -174,6 +187,44 @@ function closeLoveLetter() {
     lastLetterTrigger.focus();
   }
   lastLetterTrigger = null;
+}
+
+function openAboutLightbox(trigger) {
+  if (!aboutLightboxEl || !aboutLightboxImageEl) {
+    return;
+  }
+  const button = trigger instanceof HTMLElement ? trigger : null;
+  const innerImage = button ? button.querySelector('img') : null;
+  const fullSrc = button?.dataset.fullImage || innerImage?.currentSrc || innerImage?.src || '';
+  const altText = innerImage?.alt || 'Full size photo';
+  lastAboutTrigger = button;
+  if (fullSrc) {
+    aboutLightboxImageEl.src = fullSrc;
+  }
+  aboutLightboxImageEl.alt = altText;
+  aboutLightboxEl.classList.add('is-visible');
+  aboutLightboxEl.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  if (aboutLightboxCloseBtn) {
+    aboutLightboxCloseBtn.focus();
+  }
+}
+
+function closeAboutLightbox() {
+  if (!aboutLightboxEl) {
+    return;
+  }
+  aboutLightboxEl.classList.remove('is-visible');
+  aboutLightboxEl.setAttribute('aria-hidden', 'true');
+  if (aboutLightboxImageEl) {
+    aboutLightboxImageEl.src = '';
+    aboutLightboxImageEl.alt = 'Our full size photo';
+  }
+  restoreBodyScroll();
+  if (lastAboutTrigger) {
+    lastAboutTrigger.focus();
+  }
+  lastAboutTrigger = null;
 }
 
 function renderLoveLetters() {
@@ -257,11 +308,96 @@ if (lightboxCloseBtn) {
   lightboxCloseBtn.addEventListener('click', closeLoveLetter);
 }
 
+if (aboutImageTriggers.length) {
+  aboutImageTriggers.forEach((trigger) => {
+    trigger.addEventListener('click', () => openAboutLightbox(trigger));
+  });
+}
+
+if (aboutLightboxEl) {
+  aboutLightboxEl.addEventListener('click', (event) => {
+    if (event.target === aboutLightboxEl) {
+      closeAboutLightbox();
+    }
+  });
+}
+
+if (aboutLightboxCloseBtn) {
+  aboutLightboxCloseBtn.addEventListener('click', closeAboutLightbox);
+}
+
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && loveLightboxEl && loveLightboxEl.classList.contains('is-visible')) {
+  if (event.key !== 'Escape') {
+    return;
+  }
+  if (loveLightboxEl && loveLightboxEl.classList.contains('is-visible')) {
     closeLoveLetter();
   }
+  if (aboutLightboxEl && aboutLightboxEl.classList.contains('is-visible')) {
+    closeAboutLightbox();
+  }
 });
+
+const typewriterEls = document.querySelectorAll('[data-typewriter]');
+let typewriterStarted = false;
+
+function getTypewriterText(el) {
+  if (!(el instanceof HTMLElement)) {
+    return '';
+  }
+  const raw = typeof el.dataset.typewriter === 'string' ? el.dataset.typewriter : '';
+  const trimmed = raw.trim();
+  if (trimmed) {
+    el.dataset.typewriter = trimmed;
+    return trimmed;
+  }
+  const fallback = el.textContent.trim();
+  el.dataset.typewriter = fallback;
+  return fallback;
+}
+
+function animateTypewriter(el) {
+  if (!(el instanceof HTMLElement)) {
+    return;
+  }
+  const text = getTypewriterText(el);
+  if (!text) {
+    el.classList.add('is-complete');
+    return;
+  }
+  const speedValue = Number.parseInt(el.dataset.typewriterSpeed || '', 10);
+  const delayValue = Number.parseInt(el.dataset.typewriterDelay || '', 10) || 0;
+  const step = Number.isFinite(speedValue) && speedValue > 0 ? speedValue : 90;
+  el.classList.remove('is-complete');
+  el.textContent = '';
+  const startTyping = () => {
+    let index = 0;
+    const typeNext = () => {
+      el.textContent = text.slice(0, index + 1);
+      index += 1;
+      if (index < text.length) {
+        setTimeout(typeNext, step);
+      } else {
+        el.textContent = text;
+        el.classList.add('is-complete');
+      }
+    };
+    typeNext();
+  };
+  if (delayValue > 0) {
+    setTimeout(startTyping, delayValue);
+  } else {
+    startTyping();
+  }
+}
+
+function startTypewriterAnimations() {
+  if (typewriterStarted) {
+    return;
+  }
+  typewriterStarted = true;
+  typewriterEls.forEach((el) => animateTypewriter(el));
+}
 
 // Timeline data (edit dates/labels)
 const timelineData = [
@@ -293,6 +429,7 @@ function wrongPin() {
 
 function unlockSite() {
   lock.style.display = 'none';
+  startTypewriterAnimations();
   initMusicAfterGesture();
   reveal();
   if (playerEl) {
@@ -314,6 +451,10 @@ pin.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') checkPin();
 });
 
+if (!lock || window.getComputedStyle(lock).display === 'none') {
+  startTypewriterAnimations();
+}
+
 // ======= YouTube background music =======
 const yt = document.getElementById('yt');
 const playerEl = document.getElementById('player');
@@ -327,30 +468,113 @@ const playlistEl = document.getElementById('playlist');
 let isPlaying = false;
 let currentTrackIndex = 0;
 
-function buildPlaylistSrc(activeIndex, { autoplay = true, mute = false } = {}) {
-  const track = PLAYLIST[activeIndex];
-  if (!track) {
-    return '';
+let ytPlayer = null;
+let youTubeScriptRequested = false;
+let youTubePlayerReadyResolved = false;
+let youTubePlayerReadyResolve;
+
+const youTubePlayerReadyPromise = new Promise((resolve) => {
+  youTubePlayerReadyResolve = (player) => {
+    if (!youTubePlayerReadyResolved) {
+      youTubePlayerReadyResolved = true;
+      resolve(player);
+    }
+  };
+});
+
+function ensureYouTubeIframeAPIScript() {
+  if (window.YT && typeof window.YT.Player === 'function') {
+    return;
   }
-  const playlistIds = PLAYLIST.map((item) => item.id).join(',');
-  const base = `https://www.youtube.com/embed/${track.id}`;
-  const params = new URLSearchParams({
-    autoplay: autoplay ? '1' : '0',
-    loop: '1',
-    playlist: playlistIds,
-    controls: '0',
-    modestbranding: '1',
-    rel: '0',
-    mute: mute ? '1' : '0',
-  });
-  return `${base}?${params.toString()}`;
+  if (youTubeScriptRequested) {
+    return;
+  }
+  youTubeScriptRequested = true;
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  tag.async = true;
+  document.head.append(tag);
 }
 
-function setYT(src) {
-  if (yt) {
-    yt.src = src;
+function handlePlayerStateChange(event) {
+  if (!event || typeof event.data !== 'number' || !PLAYLIST.length) {
+    return;
+  }
+  const PlayerState = window.YT?.PlayerState;
+  switch (event.data) {
+    case PlayerState?.ENDED: {
+      const nextIndex = (currentTrackIndex + 1) % PLAYLIST.length;
+      selectTrack(nextIndex, { autoplay: true });
+      break;
+    }
+    case PlayerState?.PLAYING: {
+      if (!isPlaying) {
+        isPlaying = true;
+      }
+      updatePlayerUI();
+      break;
+    }
+    case PlayerState?.PAUSED: {
+      if (isPlaying) {
+        isPlaying = false;
+      }
+      updatePlayerUI();
+      break;
+    }
+    default:
   }
 }
+
+function createYouTubePlayer() {
+  if (!yt || ytPlayer) {
+    return;
+  }
+  ytPlayer = new YT.Player('yt', {
+    height: '0',
+    width: '0',
+    playerVars: {
+      autoplay: 0,
+      controls: 0,
+      disablekb: 1,
+      rel: 0,
+      modestbranding: 1,
+      playsinline: 1,
+    },
+    events: {
+      onReady: (event) => {
+        ytPlayer = event.target;
+        if (typeof youTubePlayerReadyResolve === 'function') {
+          youTubePlayerReadyResolve(event.target);
+        }
+      },
+      onStateChange: handlePlayerStateChange,
+    },
+  });
+}
+
+function ensureYouTubePlayer() {
+  if (!yt) {
+    return Promise.resolve(null);
+  }
+  if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
+    return Promise.resolve(ytPlayer);
+  }
+  ensureYouTubeIframeAPIScript();
+  if (window.YT && typeof window.YT.Player === 'function' && !ytPlayer) {
+    createYouTubePlayer();
+  }
+  return youTubePlayerReadyPromise;
+}
+
+window.onYouTubeIframeAPIReady = () => {
+  if (!yt) {
+    if (typeof youTubePlayerReadyResolve === 'function') {
+      youTubePlayerReadyResolve(null);
+    }
+    return;
+  }
+  createYouTubePlayer();
+};
 
 function highlightActiveTrack() {
   if (!playlistEl) {
@@ -410,34 +634,34 @@ function renderPlaylist() {
   }).join('');
 }
 
-function buildAndSetSrc(options) {
-  const src = buildPlaylistSrc(currentTrackIndex, options);
-  if (src) {
-    setYT(src);
-  }
-}
-
 function playMusic() {
   if (!PLAYLIST.length) {
     return;
   }
-  buildAndSetSrc({ autoplay: true, mute: false });
+  if (!ytPlayer) {
+    selectTrack(currentTrackIndex, { autoplay: true });
+    return;
+  }
   isPlaying = true;
   updatePlayerUI();
+  ensureYouTubePlayer().then((player) => {
+    if (player && typeof player.playVideo === 'function') {
+      player.playVideo();
+    }
+  });
 }
 
 function pauseMusic() {
   if (!PLAYLIST.length) {
     return;
   }
-  if (!yt || !yt.src) {
-    isPlaying = false;
-    updatePlayerUI();
-    return;
-  }
-  buildAndSetSrc({ autoplay: false, mute: true });
   isPlaying = false;
   updatePlayerUI();
+  ensureYouTubePlayer().then((player) => {
+    if (player && typeof player.pauseVideo === 'function') {
+      player.pauseVideo();
+    }
+  });
 }
 
 function selectTrack(index, { autoplay = true } = {}) {
@@ -445,20 +669,36 @@ function selectTrack(index, { autoplay = true } = {}) {
     return;
   }
   currentTrackIndex = index;
-  if (autoplay) {
-    playMusic();
-  } else {
-    buildAndSetSrc({ autoplay: false, mute: true });
-    isPlaying = false;
-    updatePlayerUI();
-  }
+  isPlaying = Boolean(autoplay);
+  updatePlayerUI();
+  ensureYouTubePlayer().then((player) => {
+    if (!player) {
+      return;
+    }
+    const track = PLAYLIST[currentTrackIndex];
+    if (!track) {
+      return;
+    }
+    if (autoplay) {
+      player.loadVideoById(track.id);
+    } else if (typeof player.cueVideoById === 'function') {
+      player.cueVideoById(track.id);
+    } else {
+      player.loadVideoById(track.id);
+      if (typeof player.pauseVideo === 'function') {
+        player.pauseVideo();
+      }
+    }
+  });
 }
 
 function initMusicAfterGesture() {
   if (!PLAYLIST.length) {
     return;
   }
-  selectTrack(currentTrackIndex, { autoplay: true });
+  ensureYouTubePlayer().then(() => {
+    selectTrack(currentTrackIndex, { autoplay: true });
+  });
 }
 
 renderPlaylist();
@@ -467,10 +707,6 @@ updatePlayerUI();
 if (toggleBtn) {
   toggleBtn.addEventListener('click', () => {
     if (!PLAYLIST.length) {
-      return;
-    }
-    if (!yt || !yt.src) {
-      selectTrack(currentTrackIndex, { autoplay: true });
       return;
     }
     if (isPlaying) {

@@ -30,7 +30,15 @@
     <!-- Nav -->
     <nav>
       <div class="container nav-inner">
-        <div class="brand">Lynx's Love Story ❤️</div>
+        <div class="brand" aria-label="Lynx's Love Story ❤️">
+          <span
+            class="typewriter"
+            data-typewriter="Lynx's Love Story ❤️"
+            data-typewriter-speed="85"
+          >
+            Lynx's Love Story ❤️
+          </span>
+        </div>
         <div class="menu">
           <a href="#home">Home</a>
           <a href="#about">About</a>
@@ -46,7 +54,17 @@
       <section id="home">
         <div class="container hero reveal card">
           <div>
-            <h1>Hi, my Empress 🌹</h1>
+            <h1>
+              <span
+                class="typewriter hero-typewriter"
+                data-typewriter="Hi, my Empress"
+                data-typewriter-speed="110"
+                data-typewriter-delay="120"
+              >
+                Hi, my Empress
+              </span>
+              <span class="hero-flower" role="img" aria-label="Rose">🌹</span>
+            </h1>
             <p>Every beat, every breath, every sunrise feels softer with you in it. This little corner of the web is just for you — a scrapbook of our story, wrapped in stardust and pink clouds. May this be our last pages, my number one</p>
             <p style="margin-top: 12px"><strong>Scroll</strong> to wander through our memories, or <strong>Jump</strong> with the menu through our journey.</p>
           </div>
@@ -66,7 +84,15 @@
               <br />
             </div>
             <div class="about-img">
-              <img src="images/couple.jpg" alt="Couple" class="about-img-pic" />
+              <button
+                type="button"
+                class="about-img-trigger"
+                aria-haspopup="dialog"
+                aria-label="View our photo in full size"
+                data-full-image="images/couple.jpg"
+              >
+                <img src="images/couple.jpg" alt="Couple" class="about-img-pic" />
+              </button>
             </div>
           </div>
         </div>
@@ -101,6 +127,13 @@
           <button type="button" class="love-lightbox__close" id="lightboxClose" aria-label="Close letter"></button>
           <img id="lightboxImage" alt="" class="love-lightbox__image" />
           <div class="love-lightbox__caption" id="lightboxCaption"></div>
+        </div>
+      </div>
+
+      <div class="love-lightbox love-lightbox--photo" id="aboutLightbox" aria-hidden="true" tabindex="-1">
+        <div class="love-lightbox__content" role="dialog" aria-modal="true" aria-label="Full size photo">
+          <button type="button" class="love-lightbox__close" id="aboutLightboxClose" aria-label="Close photo"></button>
+          <img id="aboutLightboxImage" alt="Our full size photo" class="love-lightbox__image" />
         </div>
       </div>
 
