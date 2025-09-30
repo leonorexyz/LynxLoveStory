@@ -664,7 +664,7 @@ function escapeHtml(text = '') {
   });
 }
 
-function updatePlayerUI() {
+function updatePlayerUI({ refreshPlaylist = true } = {}) {
   const activeTrack = PLAYLIST[currentTrackIndex];
   if (playerTitle) {
     playerTitle.textContent = activeTrack ? activeTrack.title : 'Select a song';
@@ -679,12 +679,27 @@ function updatePlayerUI() {
   if (playerEl) {
     playerEl.classList.toggle('is-playing', isPlaying);
   }
+  if (refreshPlaylist) {
+    renderPlaylist({ preserveScroll: true, preserveFocus: true });
+  }
   highlightActiveTrack();
 }
 
-function renderPlaylist() {
+function renderPlaylist({ preserveScroll = false, preserveFocus = false } = {}) {
   if (!playlistEl) {
     return;
+  }
+  const previousScrollTop = preserveScroll ? playlistEl.scrollTop : 0;
+  let focusedIndex = null;
+  if (preserveFocus) {
+    const activeButton = document.activeElement;
+    const focusTarget = activeButton?.closest?.('.player-track button');
+    if (focusTarget && playlistEl.contains(focusTarget)) {
+      const focusIndex = Number.parseInt(focusTarget.dataset.index, 10);
+      if (!Number.isNaN(focusIndex)) {
+        focusedIndex = focusIndex;
+      }
+    }
   }
   playlistEl.innerHTML = PLAYLIST.map((track, index) => {
     const number = String(index + 1).padStart(2, '0');
@@ -699,6 +714,15 @@ function renderPlaylist() {
       </li>
     `;
   }).join('');
+  if (preserveScroll) {
+    playlistEl.scrollTop = previousScrollTop;
+  }
+  if (preserveFocus && focusedIndex !== null) {
+    const newFocusTarget = playlistEl.querySelector(`button[data-index="${focusedIndex}"]`);
+    if (newFocusTarget) {
+      newFocusTarget.focus();
+    }
+  }
 }
 
 function playMusic() {
@@ -810,7 +834,6 @@ function handlePlayerError() {
   selectTrack(nextIndex, { autoplay: true });
 }
 
-renderPlaylist();
 updatePlayerUI();
 
 if (toggleBtn) {
