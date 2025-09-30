@@ -85,6 +85,31 @@ nav {
   transform: translateY(-1px);
   color: #52394a;
 }
+
+@media (max-width: 720px) {
+  nav {
+    padding: 0.7rem 1.2rem;
+  }
+  .nav-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .brand {
+    font-size: 1.8rem;
+  }
+  .menu {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    gap: 12px;
+  }
+  .menu a {
+    flex: 1 1 calc(50% - 12px);
+    text-align: center;
+    padding: 8px 0;
+  }
+}
 main {
   position: relative;
   z-index: 1;
@@ -94,6 +119,13 @@ section {
   display: grid;
   place-items: center;
   padding: 110px 16px 64px;
+}
+
+@media (max-width: 768px) {
+  section {
+    min-height: auto;
+    padding: 120px 16px 72px;
+  }
 }
 .card {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.35));
@@ -145,6 +177,19 @@ p {
 @media (max-width: 860px) {
   .hero {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    text-align: center;
+    gap: 20px;
+  }
+  .hero p {
+    text-align: left;
+  }
+  .hero .image {
+    width: 100%;
   }
 }
 /* About Us 2-column */
@@ -228,11 +273,14 @@ p {
 }
 /* Letters */
 .letters-shell {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.52));
-  padding: clamp(24px, 3vw, 40px);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.94), rgba(255, 235, 244, 0.78));
+  padding: clamp(26px, 4vw, 48px);
   display: flex;
   flex-direction: column;
   gap: clamp(24px, 4vw, 40px);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 18px 46px rgba(214, 31, 114, 0.18);
 }
 
 .letters-header {
@@ -256,19 +304,38 @@ p {
 .letter-gallery {
   display: grid;
   gap: clamp(18px, 3vw, 28px);
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 600px) {
+  .letter-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .letter-gallery {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .letter-gallery {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 .love-card {
   position: relative;
   overflow: hidden;
   border-radius: 24px;
-  padding: 24px 20px 26px;
+  padding: 24px 20px 28px;
   text-align: center;
-  background: linear-gradient(160deg, rgba(255, 240, 246, 0.95), rgba(255, 214, 232, 0.7));
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 18px 36px rgba(224, 101, 151, 0.18);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  background: linear-gradient(160deg, rgba(255, 240, 246, 0.96), rgba(255, 214, 232, 0.78));
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  box-shadow: 0 18px 36px rgba(224, 101, 151, 0.2);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, outline 0.25s ease;
+  cursor: pointer;
 }
 
 .love-card::before,
@@ -297,6 +364,18 @@ p {
 .love-card:hover {
   transform: translateY(-6px) scale(1.02);
   box-shadow: 0 24px 40px rgba(224, 101, 151, 0.28);
+}
+
+.love-card:focus-visible {
+  outline: 3px solid rgba(255, 122, 182, 0.7);
+  outline-offset: 4px;
+  transform: translateY(-4px) scale(1.01);
+}
+
+@media (max-width: 600px) {
+  .love-card {
+    padding: 22px 18px 24px;
+  }
 }
 
 .love-card__ring {
