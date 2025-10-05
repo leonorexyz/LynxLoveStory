@@ -147,6 +147,7 @@ const loveLetters = [
 ];
 
 const letterGalleryEl = document.getElementById('letterGallery');
+const heroCarouselEl = document.querySelector('[data-hero-carousel]');
 const loveLightboxEl = document.getElementById('loveLightbox');
 const lightboxImageEl = document.getElementById('lightboxImage');
 const lightboxCaptionEl = document.getElementById('lightboxCaption');
@@ -178,6 +179,125 @@ const LIGHTBOX_MAX_ZOOM = 3.2;
 const LIGHTBOX_ZOOM_STEP = 0.25;
 const reduceMotionQuery = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
 let prefersReducedMotion = Boolean(reduceMotionQuery?.matches);
+
+const reduceMotionSubscribers = [];
+
+function emitReduceMotionPreferenceChange(matches) {
+  reduceMotionSubscribers.forEach((callback) => {
+    try {
+      callback(matches);
+    } catch (error) {
+      console.error('Error in reduce motion subscriber', error);
+    }
+  });
+}
+
+function onReduceMotionPreferenceChange(callback) {
+  if (typeof callback === 'function') {
+    reduceMotionSubscribers.push(callback);
+  }
+}
+
+if (reduceMotionQuery) {
+  const handleReduceMotionChange = (event) => {
+    const matches = typeof event === 'boolean' ? event : Boolean(event.matches);
+    prefersReducedMotion = matches;
+    emitReduceMotionPreferenceChange(matches);
+  };
+  if (typeof reduceMotionQuery.addEventListener === 'function') {
+    reduceMotionQuery.addEventListener('change', handleReduceMotionChange);
+  } else if (typeof reduceMotionQuery.addListener === 'function') {
+    reduceMotionQuery.addListener(handleReduceMotionChange);
+  }
+}
+
+if (heroCarouselEl) {
+  const heroCarouselTrackEl = heroCarouselEl.querySelector('[data-hero-track]');
+  const heroCarouselSlides = heroCarouselTrackEl ? Array.from(heroCarouselTrackEl.children) : [];
+  const heroCarouselDots = Array.from(heroCarouselEl.querySelectorAll('[data-hero-dot]'));
+  let heroCarouselIndex = 0;
+  let heroCarouselTimer = null;
+  const HERO_CAROUSEL_INTERVAL = 6000;
+
+  const setHeroCarouselSlide = (targetIndex, options = {}) => {
+    if (!heroCarouselTrackEl || !heroCarouselSlides.length) {
+      return;
+    }
+    const total = heroCarouselSlides.length;
+    const { immediate = false } = options;
+    heroCarouselIndex = ((targetIndex % total) + total) % total;
+    const offset = heroCarouselIndex * -100;
+    if (immediate) {
+      heroCarouselTrackEl.classList.add('hero-carousel__track--no-transition');
+    }
+    heroCarouselTrackEl.style.transform = `translateX(${offset}%)`;
+    if (immediate) {
+      requestAnimationFrame(() => {
+        heroCarouselTrackEl.classList.remove('hero-carousel__track--no-transition');
+      });
+    }
+    heroCarouselSlides.forEach((slide, index) => {
+      slide.classList.toggle('is-active', index === heroCarouselIndex);
+    });
+    heroCarouselDots.forEach((dot, index) => {
+      const isActive = index === heroCarouselIndex;
+      dot.classList.toggle('is-active', isActive);
+      dot.setAttribute('aria-current', isActive ? 'true' : 'false');
+    });
+  };
+
+  const stopHeroCarouselAutoplay = () => {
+    if (heroCarouselTimer !== null) {
+      window.clearInterval(heroCarouselTimer);
+      heroCarouselTimer = null;
+    }
+  };
+
+  const startHeroCarouselAutoplay = () => {
+    if (prefersReducedMotion || heroCarouselSlides.length < 2) {
+      stopHeroCarouselAutoplay();
+      return;
+    }
+    stopHeroCarouselAutoplay();
+    heroCarouselTimer = window.setInterval(() => {
+      setHeroCarouselSlide(heroCarouselIndex + 1);
+    }, HERO_CAROUSEL_INTERVAL);
+  };
+
+  heroCarouselDots.forEach((dot) => {
+    const targetIndex = Number.parseInt(dot.dataset.heroDot || '', 10);
+    if (Number.isNaN(targetIndex)) {
+      return;
+    }
+    dot.addEventListener('click', () => {
+      setHeroCarouselSlide(targetIndex);
+      startHeroCarouselAutoplay();
+    });
+  });
+
+  const applyMotionPreferenceToHero = (matches) => {
+    heroCarouselEl.classList.toggle('hero-carousel--reduced', matches);
+    if (matches) {
+      stopHeroCarouselAutoplay();
+      setHeroCarouselSlide(heroCarouselIndex, { immediate: true });
+    } else {
+      startHeroCarouselAutoplay();
+    }
+  };
+
+  heroCarouselEl.addEventListener('mouseenter', stopHeroCarouselAutoplay);
+  heroCarouselEl.addEventListener('mouseleave', startHeroCarouselAutoplay);
+  heroCarouselEl.addEventListener('focusin', stopHeroCarouselAutoplay);
+  heroCarouselEl.addEventListener('focusout', (event) => {
+    if (!heroCarouselEl.contains(event.relatedTarget)) {
+      startHeroCarouselAutoplay();
+    }
+  });
+
+  setHeroCarouselSlide(heroCarouselIndex, { immediate: true });
+  applyMotionPreferenceToHero(prefersReducedMotion);
+  onReduceMotionPreferenceChange(applyMotionPreferenceToHero);
+}
 
 function restoreBodyScroll() {
   const loveOpen = loveLightboxEl?.classList.contains('is-visible');
