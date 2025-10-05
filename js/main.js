@@ -158,6 +158,9 @@ const lightboxStageEl = document.getElementById('lightboxStage');
 const lightboxZoomOutBtn = document.getElementById('lightboxZoomOut');
 const lightboxZoomResetBtn = document.getElementById('lightboxZoomReset');
 const lightboxZoomInBtn = document.getElementById('lightboxZoomIn');
+const heroLightboxEl = document.getElementById('heroLightbox');
+const heroLightboxImageEl = document.getElementById('heroLightboxImage');
+const heroLightboxCloseBtn = document.getElementById('heroLightboxClose');
 const aboutImageTriggers = document.querySelectorAll('.about-img-trigger');
 const aboutLightboxEl = document.getElementById('aboutLightbox');
 const aboutLightboxImageEl = document.getElementById('aboutLightboxImage');
@@ -166,6 +169,7 @@ const scrollTopBtn = document.getElementById('scrollTopBtn');
 
 let lastLetterTrigger = null;
 let lastAboutTrigger = null;
+let lastHeroLightboxTrigger = null;
 let currentLetterIndex = -1;
 let lightboxZoomLevel = 1;
 let lightboxPanX = 0;
@@ -179,6 +183,9 @@ const LIGHTBOX_MAX_ZOOM = 3.2;
 const LIGHTBOX_ZOOM_STEP = 0.25;
 const reduceMotionQuery = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
 let prefersReducedMotion = Boolean(reduceMotionQuery?.matches);
+
+let pauseHeroCarouselAutoplay = null;
+let resumeHeroCarouselAutoplay = null;
 
 const reduceMotionSubscribers = [];
 
@@ -215,6 +222,9 @@ if (heroCarouselEl) {
   const heroCarouselTrackEl = heroCarouselEl.querySelector('[data-hero-track]');
   const heroCarouselSlides = heroCarouselTrackEl ? Array.from(heroCarouselTrackEl.children) : [];
   const heroCarouselDots = Array.from(heroCarouselEl.querySelectorAll('[data-hero-dot]'));
+  const heroCarouselPrevBtn = heroCarouselEl.querySelector('[data-hero-prev]');
+  const heroCarouselNextBtn = heroCarouselEl.querySelector('[data-hero-next]');
+  const heroCarouselLightboxTriggers = Array.from(heroCarouselEl.querySelectorAll('[data-hero-lightbox]'));
   let heroCarouselIndex = 0;
   let heroCarouselTimer = null;
   const HERO_CAROUSEL_INTERVAL = 6000;
@@ -275,6 +285,26 @@ if (heroCarouselEl) {
     });
   });
 
+  if (heroCarouselPrevBtn) {
+    heroCarouselPrevBtn.addEventListener('click', () => {
+      setHeroCarouselSlide(heroCarouselIndex - 1);
+      startHeroCarouselAutoplay();
+    });
+  }
+
+  if (heroCarouselNextBtn) {
+    heroCarouselNextBtn.addEventListener('click', () => {
+      setHeroCarouselSlide(heroCarouselIndex + 1);
+      startHeroCarouselAutoplay();
+    });
+  }
+
+  heroCarouselLightboxTriggers.forEach((trigger) => {
+    trigger.addEventListener('click', () => {
+      openHeroLightbox(trigger);
+    });
+  });
+
   const applyMotionPreferenceToHero = (matches) => {
     heroCarouselEl.classList.toggle('hero-carousel--reduced', matches);
     if (matches) {
@@ -297,12 +327,16 @@ if (heroCarouselEl) {
   setHeroCarouselSlide(heroCarouselIndex, { immediate: true });
   applyMotionPreferenceToHero(prefersReducedMotion);
   onReduceMotionPreferenceChange(applyMotionPreferenceToHero);
+
+  pauseHeroCarouselAutoplay = stopHeroCarouselAutoplay;
+  resumeHeroCarouselAutoplay = startHeroCarouselAutoplay;
 }
 
 function restoreBodyScroll() {
   const loveOpen = loveLightboxEl?.classList.contains('is-visible');
   const aboutOpen = aboutLightboxEl?.classList.contains('is-visible');
-  if (!loveOpen && !aboutOpen) {
+  const heroOpen = heroLightboxEl?.classList.contains('is-visible');
+  if (!loveOpen && !aboutOpen && !heroOpen) {
     document.body.style.overflow = '';
   }
 }
@@ -598,6 +632,50 @@ function closeAboutLightbox() {
   lastAboutTrigger = null;
 }
 
+function openHeroLightbox(trigger) {
+  if (!heroLightboxEl || !heroLightboxImageEl) {
+    return;
+  }
+  const button = trigger instanceof HTMLElement ? trigger : null;
+  const innerImage = button ? button.querySelector('img') : null;
+  const fullSrc = button?.dataset.heroLightbox || innerImage?.currentSrc || innerImage?.src || '';
+  const altText = innerImage?.alt || 'Memory from our scrapbook';
+  lastHeroLightboxTrigger = button;
+  if (fullSrc) {
+    heroLightboxImageEl.src = fullSrc;
+  }
+  heroLightboxImageEl.alt = altText;
+  heroLightboxEl.classList.add('is-visible');
+  heroLightboxEl.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  pauseHeroCarouselAutoplay?.();
+  if (heroLightboxCloseBtn) {
+    heroLightboxCloseBtn.focus();
+  }
+}
+
+function closeHeroLightbox() {
+  if (!heroLightboxEl) {
+    return;
+  }
+  heroLightboxEl.classList.remove('is-visible');
+  heroLightboxEl.setAttribute('aria-hidden', 'true');
+  if (heroLightboxImageEl) {
+    heroLightboxImageEl.src = '';
+    heroLightboxImageEl.alt = '';
+  }
+  restoreBodyScroll();
+  if (lastHeroLightboxTrigger) {
+    lastHeroLightboxTrigger.focus();
+  }
+  lastHeroLightboxTrigger = null;
+  if (heroCarouselEl && heroCarouselEl.matches(':hover')) {
+    pauseHeroCarouselAutoplay?.();
+  } else {
+    resumeHeroCarouselAutoplay?.();
+  }
+}
+
 function renderLoveLetters() {
   if (!letterGalleryEl) {
     return;
@@ -720,6 +798,18 @@ if (aboutImageTriggers.length) {
   });
 }
 
+if (heroLightboxEl) {
+  heroLightboxEl.addEventListener('click', (event) => {
+    if (event.target === heroLightboxEl) {
+      closeHeroLightbox();
+    }
+  });
+}
+
+if (heroLightboxCloseBtn) {
+  heroLightboxCloseBtn.addEventListener('click', closeHeroLightbox);
+}
+
 if (aboutLightboxEl) {
   aboutLightboxEl.addEventListener('click', (event) => {
     if (event.target === aboutLightboxEl) {
@@ -735,12 +825,16 @@ if (aboutLightboxCloseBtn) {
 document.addEventListener('keydown', (event) => {
   const loveLightboxVisible = loveLightboxEl && loveLightboxEl.classList.contains('is-visible');
   const aboutLightboxVisible = aboutLightboxEl && aboutLightboxEl.classList.contains('is-visible');
+  const heroLightboxVisible = heroLightboxEl && heroLightboxEl.classList.contains('is-visible');
   if (event.key === 'Escape') {
     if (loveLightboxVisible) {
       closeLoveLetter();
     }
     if (aboutLightboxVisible) {
       closeAboutLightbox();
+    }
+    if (heroLightboxVisible) {
+      closeHeroLightbox();
     }
     return;
   }
