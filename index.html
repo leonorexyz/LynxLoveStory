@@ -71,42 +71,93 @@
             <div class="hero-carousel__viewport">
               <div class="hero-carousel__track" data-hero-track>
                 <figure class="hero-carousel__slide">
-                  <img src="images/Carousel/1.png" alt="Memory 1 from our scrapbook" class="hero-carousel__image" />
+                  <button
+                    type="button"
+                    class="hero-carousel__lightbox-trigger"
+                    data-hero-lightbox="images/Carousel/1.png"
+                    aria-label="View memory 1 in full size"
+                  >
+                    <img src="images/Carousel/1.png" alt="Memory 1 from our scrapbook" class="hero-carousel__image" />
+                  </button>
                 </figure>
                 <figure class="hero-carousel__slide">
-                  <img
-                    src="images/Carousel/2.png"
-                    alt="Memory 2 from our scrapbook"
-                    class="hero-carousel__image"
-                    loading="lazy"
-                  />
+                  <button
+                    type="button"
+                    class="hero-carousel__lightbox-trigger"
+                    data-hero-lightbox="images/Carousel/2.png"
+                    aria-label="View memory 2 in full size"
+                  >
+                    <img
+                      src="images/Carousel/2.png"
+                      alt="Memory 2 from our scrapbook"
+                      class="hero-carousel__image"
+                      loading="lazy"
+                    />
+                  </button>
                 </figure>
                 <figure class="hero-carousel__slide">
-                  <img
-                    src="images/Carousel/3.png"
-                    alt="Memory 3 from our scrapbook"
-                    class="hero-carousel__image"
-                    loading="lazy"
-                  />
+                  <button
+                    type="button"
+                    class="hero-carousel__lightbox-trigger"
+                    data-hero-lightbox="images/Carousel/3.png"
+                    aria-label="View memory 3 in full size"
+                  >
+                    <img
+                      src="images/Carousel/3.png"
+                      alt="Memory 3 from our scrapbook"
+                      class="hero-carousel__image"
+                      loading="lazy"
+                    />
+                  </button>
                 </figure>
                 <figure class="hero-carousel__slide">
-                  <img
-                    src="images/Carousel/4.png"
-                    alt="Memory 4 from our scrapbook"
-                    class="hero-carousel__image"
-                    loading="lazy"
-                  />
+                  <button
+                    type="button"
+                    class="hero-carousel__lightbox-trigger"
+                    data-hero-lightbox="images/Carousel/4.png"
+                    aria-label="View memory 4 in full size"
+                  >
+                    <img
+                      src="images/Carousel/4.png"
+                      alt="Memory 4 from our scrapbook"
+                      class="hero-carousel__image"
+                      loading="lazy"
+                    />
+                  </button>
                 </figure>
                 <figure class="hero-carousel__slide">
-                  <img
-                    src="images/Carousel/5.png"
-                    alt="Memory 5 from our scrapbook"
-                    class="hero-carousel__image"
-                    loading="lazy"
-                  />
+                  <button
+                    type="button"
+                    class="hero-carousel__lightbox-trigger"
+                    data-hero-lightbox="images/Carousel/5.png"
+                    aria-label="View memory 5 in full size"
+                  >
+                    <img
+                      src="images/Carousel/5.png"
+                      alt="Memory 5 from our scrapbook"
+                      class="hero-carousel__image"
+                      loading="lazy"
+                    />
+                  </button>
                 </figure>
               </div>
             </div>
+            <button
+              type="button"
+              class="hero-carousel__nav hero-carousel__nav--prev"
+              data-hero-prev
+              aria-label="Show previous memory"
+            >
+              <span aria-hidden="true">‹</span>
+            </button>
+            <button
+              type="button"
+              class="hero-carousel__nav hero-carousel__nav--next"
+              data-hero-next
+              aria-label="Show next memory"
+            >
+              <span aria-hidden="true">›</span>
+            </button>
             <div class="hero-carousel__dots" role="tablist">
               <button type="button" class="hero-carousel__dot is-active" data-hero-dot="0" aria-label="Show memory 1" aria-current="true"></button>
               <button type="button" class="hero-carousel__dot" data-hero-dot="1" aria-label="Show memory 2" aria-current="false"></button>
@@ -196,6 +247,13 @@
         <div class="love-lightbox__caption" id="lightboxCaption"></div>
       </div>
     </div>
+
+      <div class="love-lightbox love-lightbox--photo" id="heroLightbox" aria-hidden="true" tabindex="-1">
+        <div class="love-lightbox__content" role="dialog" aria-modal="true" aria-label="Full size memory photo">
+          <button type="button" class="love-lightbox__close" id="heroLightboxClose" aria-label="Close photo"></button>
+          <img id="heroLightboxImage" alt="" class="love-lightbox__image" />
+        </div>
+      </div>
 
       <div class="love-lightbox love-lightbox--photo" id="aboutLightbox" aria-hidden="true" tabindex="-1">
         <div class="love-lightbox__content" role="dialog" aria-modal="true" aria-label="Full size photo">
