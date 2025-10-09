@@ -251,7 +251,23 @@
       <div class="love-lightbox love-lightbox--photo" id="heroLightbox" aria-hidden="true" tabindex="-1">
         <div class="love-lightbox__content" role="dialog" aria-modal="true" aria-label="Full size memory photo">
           <button type="button" class="love-lightbox__close" id="heroLightboxClose" aria-label="Close photo"></button>
-          <img id="heroLightboxImage" alt="" class="love-lightbox__image" />
+          <div class="love-lightbox__viewer">
+            <button
+              type="button"
+              class="love-lightbox__nav love-lightbox__nav--prev"
+              id="heroLightboxPrev"
+              aria-label="View previous memory"
+            ></button>
+            <div class="love-lightbox__stage" id="heroLightboxStage">
+              <img id="heroLightboxImage" alt="" class="love-lightbox__image" />
+            </div>
+            <button
+              type="button"
+              class="love-lightbox__nav love-lightbox__nav--next"
+              id="heroLightboxNext"
+              aria-label="View next memory"
+            ></button>
+          </div>
         </div>
       </div>
 
@@ -298,8 +314,21 @@
           </div>
         </div>
       </div>
-      <div class="player-list-header">Playlist</div>
-      <ul class="player-playlist" id="playlist"></ul>
+      <div class="player-playlist-accordion">
+        <button
+          class="player-list-toggle"
+          id="playlistToggle"
+          type="button"
+          aria-expanded="true"
+          aria-controls="playlistPanel"
+        >
+          <span class="player-list-header">Playlist</span>
+          <span class="player-list-toggle__icon" aria-hidden="true"></span>
+        </button>
+        <div class="player-playlist-panel" id="playlistPanel">
+          <ul class="player-playlist" id="playlist"></ul>
+        </div>
+      </div>
     </div>
 
     <button type="button" class="scroll-top" id="scrollTopBtn" aria-label="Scroll back to top">

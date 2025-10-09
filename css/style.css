@@ -251,7 +251,10 @@ p {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: clamp(16px, 3vw, 32px);
+  border-radius: clamp(18px, 3vw, 28px);
   background: linear-gradient(200deg, rgba(255, 255, 255, 0.8), rgba(255, 216, 233, 0.85));
+  overflow: hidden;
 }
 
 .hero-carousel__slide::after {
@@ -261,6 +264,7 @@ p {
   background: linear-gradient(180deg, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.22) 100%);
   mix-blend-mode: multiply;
   pointer-events: none;
+  border-radius: inherit;
 }
 
 .hero-carousel__lightbox-trigger {
@@ -281,13 +285,17 @@ p {
 }
 
 .hero-carousel__image {
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   object-position: center;
   display: block;
   filter: saturate(1.05) contrast(1.02);
   background: #fff;
+  border-radius: clamp(14px, 2.6vw, 24px);
+  box-shadow: 0 12px 28px rgba(199, 42, 115, 0.18);
 }
 
 .hero-carousel__nav {
@@ -876,6 +884,16 @@ p {
   padding: clamp(18px, 3vw, 28px);
 }
 
+.love-lightbox--photo .love-lightbox__viewer {
+  gap: clamp(12px, 2.5vw, 20px);
+}
+
+.love-lightbox--photo .love-lightbox__stage {
+  cursor: default;
+  touch-action: auto;
+  max-height: min(80vh, 720px);
+}
+
 .love-lightbox--photo .love-lightbox__image {
   width: 100%;
   height: auto;
@@ -1124,6 +1142,14 @@ p {
   background: linear-gradient(165deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.58));
   box-shadow: 0 18px 48px rgba(214, 31, 114, 0.28);
   backdrop-filter: blur(16px);
+  opacity: 0.68;
+  transition: opacity 0.25s ease, box-shadow 0.25s ease;
+}
+
+.player:hover,
+.player:focus-within {
+  opacity: 1;
+  box-shadow: 0 20px 52px rgba(214, 31, 114, 0.32);
 }
 
 .player-body {
@@ -1240,6 +1266,78 @@ p {
   color: #b07a94;
   font-weight: 700;
   padding-left: 4px;
+}
+
+.player-playlist-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.player-list-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  border: none;
+  border-radius: 18px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.52);
+  cursor: url('../images/heart_cursor.svg') 8 8, pointer;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 8px 18px rgba(214, 31, 114, 0.12);
+}
+
+.player-list-toggle:hover {
+  background: rgba(255, 255, 255, 0.78);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(214, 31, 114, 0.18);
+}
+
+.player-list-toggle:focus-visible {
+  outline: 3px solid rgba(255, 143, 194, 0.85);
+  outline-offset: 2px;
+}
+
+.player-list-toggle__icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(255, 120, 180, 0.95), rgba(255, 170, 210, 0.95));
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 0.95rem;
+  line-height: 1;
+  transition: transform 0.25s ease;
+}
+
+.player-list-toggle__icon::before {
+  content: '⌄';
+  transform: translateY(-1px);
+}
+
+.player-playlist-panel {
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+  max-height: 220px;
+  opacity: 1;
+}
+
+.player--playlist-collapsed .player-playlist-panel {
+  max-height: 0;
+  opacity: 0;
+  margin-top: -6px;
+  pointer-events: none;
+}
+
+.player--playlist-collapsed .player-list-toggle__icon {
+  transform: rotate(-180deg);
+}
+
+.player--playlist-collapsed .player-playlist {
+  overflow: hidden;
 }
 
 .player-playlist {

@@ -162,11 +162,15 @@ const lightboxZoomInBtn = document.getElementById('lightboxZoomIn');
 const heroLightboxEl = document.getElementById('heroLightbox');
 const heroLightboxImageEl = document.getElementById('heroLightboxImage');
 const heroLightboxCloseBtn = document.getElementById('heroLightboxClose');
+const heroLightboxPrevBtn = document.getElementById('heroLightboxPrev');
+const heroLightboxNextBtn = document.getElementById('heroLightboxNext');
 const aboutImageTriggers = document.querySelectorAll('.about-img-trigger');
 const aboutLightboxEl = document.getElementById('aboutLightbox');
 const aboutLightboxImageEl = document.getElementById('aboutLightboxImage');
 const aboutLightboxCloseBtn = document.getElementById('aboutLightboxClose');
 const scrollTopBtn = document.getElementById('scrollTopBtn');
+const playlistToggleBtn = document.getElementById('playlistToggle');
+const playlistPanelEl = document.getElementById('playlistPanel');
 
 let lastLetterTrigger = null;
 let lastAboutTrigger = null;
@@ -187,6 +191,12 @@ let prefersReducedMotion = Boolean(reduceMotionQuery?.matches);
 
 let pauseHeroCarouselAutoplay = null;
 let resumeHeroCarouselAutoplay = null;
+let heroCarouselLightboxTriggers = [];
+let heroCarouselSetSlide = null;
+let heroCarouselGetIndex = () => 0;
+
+let heroLightboxIndex = 0;
+let isPlaylistExpanded = true;
 
 const reduceMotionSubscribers = [];
 
@@ -225,7 +235,7 @@ if (heroCarouselEl) {
   const heroCarouselDots = Array.from(heroCarouselEl.querySelectorAll('[data-hero-dot]'));
   const heroCarouselPrevBtn = heroCarouselEl.querySelector('[data-hero-prev]');
   const heroCarouselNextBtn = heroCarouselEl.querySelector('[data-hero-next]');
-  const heroCarouselLightboxTriggers = Array.from(heroCarouselEl.querySelectorAll('[data-hero-lightbox]'));
+  heroCarouselLightboxTriggers = Array.from(heroCarouselEl.querySelectorAll('[data-hero-lightbox]'));
   let heroCarouselIndex = 0;
   let heroCarouselTimer = null;
   const HERO_CAROUSEL_INTERVAL = 6000;
@@ -256,6 +266,12 @@ if (heroCarouselEl) {
       dot.setAttribute('aria-current', isActive ? 'true' : 'false');
     });
   };
+
+  heroCarouselSetSlide = (targetIndex, options = {}) => {
+    setHeroCarouselSlide(targetIndex, options);
+  };
+
+  heroCarouselGetIndex = () => heroCarouselIndex;
 
   const stopHeroCarouselAutoplay = () => {
     if (heroCarouselTimer !== null) {
@@ -331,6 +347,8 @@ if (heroCarouselEl) {
 
   pauseHeroCarouselAutoplay = stopHeroCarouselAutoplay;
   resumeHeroCarouselAutoplay = startHeroCarouselAutoplay;
+
+  updateHeroLightboxNavState();
 }
 
 function restoreBodyScroll() {
@@ -639,13 +657,11 @@ function openHeroLightbox(trigger) {
   }
   const button = trigger instanceof HTMLElement ? trigger : null;
   const innerImage = button ? button.querySelector('img') : null;
-  const fullSrc = button?.dataset.heroLightbox || innerImage?.currentSrc || innerImage?.src || '';
-  const altText = innerImage?.alt || 'Memory from our scrapbook';
+  const triggerIndex = button ? heroCarouselLightboxTriggers.indexOf(button) : -1;
+  const fallbackIndex = typeof heroCarouselGetIndex === 'function' ? heroCarouselGetIndex() : 0;
+  const targetIndex = triggerIndex >= 0 ? triggerIndex : fallbackIndex;
   lastHeroLightboxTrigger = button;
-  if (fullSrc) {
-    heroLightboxImageEl.src = fullSrc;
-  }
-  heroLightboxImageEl.alt = altText;
+  setHeroLightboxSlide(targetIndex, { syncCarousel: false, sourceImage: innerImage });
   heroLightboxEl.classList.add('is-visible');
   heroLightboxEl.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
@@ -674,6 +690,74 @@ function closeHeroLightbox() {
     pauseHeroCarouselAutoplay?.();
   } else {
     resumeHeroCarouselAutoplay?.();
+  }
+}
+
+function setHeroLightboxSlide(targetIndex, { syncCarousel = true, sourceImage = null } = {}) {
+  if (!heroLightboxImageEl || !heroCarouselLightboxTriggers.length) {
+    return;
+  }
+  const total = heroCarouselLightboxTriggers.length;
+  if (total === 0) {
+    return;
+  }
+  const normalizedIndex = ((targetIndex % total) + total) % total;
+  heroLightboxIndex = normalizedIndex;
+  const trigger = heroCarouselLightboxTriggers[normalizedIndex];
+  const innerImage = sourceImage || trigger?.querySelector('img');
+  const fullSrc = trigger?.dataset.heroLightbox || innerImage?.currentSrc || innerImage?.src || '';
+  const altText = innerImage?.alt || 'Memory from our scrapbook';
+  if (fullSrc) {
+    heroLightboxImageEl.src = fullSrc;
+  }
+  heroLightboxImageEl.alt = altText;
+  if (syncCarousel) {
+    heroCarouselSetSlide?.(normalizedIndex);
+  }
+  updateHeroLightboxNavState();
+}
+
+function moveHeroLightbox(delta) {
+  if (!heroCarouselLightboxTriggers.length) {
+    return;
+  }
+  setHeroLightboxSlide(heroLightboxIndex + delta);
+}
+
+function updateHeroLightboxNavState() {
+  const shouldDisable = heroCarouselLightboxTriggers.length <= 1;
+  if (heroLightboxPrevBtn) {
+    heroLightboxPrevBtn.disabled = shouldDisable;
+    heroLightboxPrevBtn.setAttribute('aria-hidden', shouldDisable ? 'true' : 'false');
+  }
+  if (heroLightboxNextBtn) {
+    heroLightboxNextBtn.disabled = shouldDisable;
+    heroLightboxNextBtn.setAttribute('aria-hidden', shouldDisable ? 'true' : 'false');
+  }
+}
+
+function setPlaylistExpanded(expanded) {
+  isPlaylistExpanded = Boolean(expanded);
+  if (!playerEl || !playlistToggleBtn || !playlistPanelEl) {
+    return;
+  }
+  playerEl.classList.toggle('player--playlist-collapsed', !isPlaylistExpanded);
+  playlistToggleBtn.setAttribute('aria-expanded', isPlaylistExpanded ? 'true' : 'false');
+  playlistPanelEl.setAttribute('aria-hidden', isPlaylistExpanded ? 'false' : 'true');
+  if (isPlaylistExpanded) {
+    playlistPanelEl.removeAttribute('inert');
+  } else {
+    playlistPanelEl.setAttribute('inert', '');
+  }
+  if (playlistEl) {
+    const trackButtons = playlistEl.querySelectorAll('button');
+    trackButtons.forEach((button) => {
+      if (button.disabled) {
+        button.tabIndex = -1;
+        return;
+      }
+      button.tabIndex = isPlaylistExpanded ? 0 : -1;
+    });
   }
 }
 
@@ -811,6 +895,14 @@ if (heroLightboxCloseBtn) {
   heroLightboxCloseBtn.addEventListener('click', closeHeroLightbox);
 }
 
+if (heroLightboxPrevBtn) {
+  heroLightboxPrevBtn.addEventListener('click', () => moveHeroLightbox(-1));
+}
+
+if (heroLightboxNextBtn) {
+  heroLightboxNextBtn.addEventListener('click', () => moveHeroLightbox(1));
+}
+
 if (aboutLightboxEl) {
   aboutLightboxEl.addEventListener('click', (event) => {
     if (event.target === aboutLightboxEl) {
@@ -839,6 +931,18 @@ document.addEventListener('keydown', (event) => {
     }
     return;
   }
+  if (heroLightboxVisible) {
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      moveHeroLightbox(1);
+      return;
+    }
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      moveHeroLightbox(-1);
+      return;
+    }
+  }
   if (!loveLightboxVisible) {
     return;
   }
@@ -850,6 +954,12 @@ document.addEventListener('keydown', (event) => {
     moveLoveLetter(-1);
   }
 });
+
+if (playlistToggleBtn) {
+  playlistToggleBtn.addEventListener('click', () => {
+    setPlaylistExpanded(!isPlaylistExpanded);
+  });
+}
 
 updateLightboxNavButtons();
 
@@ -992,6 +1102,8 @@ const toggleBtn = document.getElementById('toggleMusic');
 const prevBtn = document.getElementById('prevTrack');
 const nextBtn = document.getElementById('nextTrack');
 const playlistEl = document.getElementById('playlist');
+
+setPlaylistExpanded(isPlaylistExpanded);
 
 let isPlaying = false;
 let currentTrackIndex = 0;
@@ -1258,6 +1370,8 @@ function renderPlaylist({ preserveScroll = false, preserveFocus = false } = {}) 
       newFocusTarget.focus();
     }
   }
+
+  setPlaylistExpanded(isPlaylistExpanded);
 }
 
 function playMusic() {
