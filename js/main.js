@@ -29,6 +29,7 @@ const PLAYLIST = [
   { id: 'KnJfMzsyDS0', title: 'Inquisitive feat. Hannah Ying - 不得不爱' },
   { id: 'WCM_eSgaK6o', title: 'Vic Chou - Make a Wish' },
   { id: 'IvRQBrOY6Bk', title: '김동률 - 취중진담' },
+  { id: 'V9PVRfjEBTI', title: 'Billie Eilish - BIRDS OF A FEATHER' },
 ];
 
 const loveLetters = [
