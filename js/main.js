@@ -3,16 +3,16 @@
 const PIN_CODE = '200125'; // required 6-digit pin
 const PLAYLIST = [
   // Add new songs or reorder existing ones here to adjust the playlist sequence.
-  { id: '06-XXOTP3Gc', title: 'Shane Filan - Beautiful in White'},
+  { id: '06-XXOTP3Gc', title: 'Shane Filan - Beautiful in White' },
   { id: 'OT5msu-dap8', title: 'Backstreet Boys - Shape of My Heart' },
-  { id: 'Qy7z_oiN6nQ', title: 'George Benson - Nothing\'s Gonna Change My Love For You'},
+  { id: 'Qy7z_oiN6nQ', title: "George Benson - Nothing's Gonna Change My Love For You" },
   { id: 'DXvMT_mVbqw', title: 'K-Ci & JoJo - All My Life' },
   { id: 'Ip6cw8gfHHI', title: 'd4vd - Here With Me' },
-  { id: 'KNZH-emehxA', title: 'Shania Twain - You\'re Still The One' },
+  { id: 'KNZH-emehxA', title: "Shania Twain - You're Still The One" },
   { id: 'HeK1zQFJtXE', title: 'Tamia - Officially Missing You' },
   { id: '8MG--WuNW1Y', title: 'Wei Bird - 如果可以' },
   { id: 'S_E2EHVxNAE', title: 'Richard Marx - Right Here Waiting' },
-  { id: 'Ju8Hr50Ckwk', title: 'Alicia Keys - If I Ain\'t Got You' },
+  { id: 'Ju8Hr50Ckwk', title: "Alicia Keys - If I Ain't Got You" },
   { id: 'iBrOFd1wDuQ', title: '羅志祥 - 愛不單行' },
   { id: 'd4_QuMkOdCI', title: 'Eric Clapton - Wonderful Tonight' },
   { id: 'XJ1Jigjg1wo', title: 'Ardhito Pramono - Waking Up Together With You' },
@@ -30,6 +30,12 @@ const PLAYLIST = [
   { id: 'WCM_eSgaK6o', title: 'Vic Chou - Make a Wish' },
   { id: 'IvRQBrOY6Bk', title: '김동률 - 취중진담' },
   { id: 'V9PVRfjEBTI', title: 'Billie Eilish - BIRDS OF A FEATHER' },
+  { id: 'sKoy0EA7pyI', title: 'LEONNE - Hi, Leanne' },
+  { id: 'B84pjvZ5E1E', title: 'LEONNE - Hi, Leonore' },
+  { id: 'XoiuewknIM0', title: 'LEONNE - Hujan Kala Itu' },
+  { id: 'Lij6cfG5mew', title: 'LEONNE - Tulip & Edelweiss' },
+  { id: 'wxOWbEIWEpk', title: "LEONNE - It's Only You Baby" },
+  { id: 'kHLy37vDeRI', title: 'LEONNE - Cinta & Luka' },
 ];
 
 const loveLetters = [
@@ -426,8 +432,8 @@ function constrainLightboxPan() {
   if (!rect.width || !rect.height) {
     return;
   }
-  const limitX = ((rect.width * lightboxZoomLevel) - rect.width) / 2;
-  const limitY = ((rect.height * lightboxZoomLevel) - rect.height) / 2;
+  const limitX = (rect.width * lightboxZoomLevel - rect.width) / 2;
+  const limitY = (rect.height * lightboxZoomLevel - rect.height) / 2;
   const maxX = Math.max(limitX, 0) + 24;
   const maxY = Math.max(limitY, 0) + 24;
   lightboxPanX = clamp(lightboxPanX, -maxX, maxX);
@@ -1557,7 +1563,7 @@ if (!prefersReducedMotion && typeof IntersectionObserver === 'function') {
         }
       });
     },
-    { threshold: 0.25, rootMargin: '0px 0px -10% 0px' }
+    { threshold: 0.25, rootMargin: '0px 0px -10% 0px' },
   );
   revealEls.forEach((el) => {
     el.classList.add('is-hidden');
@@ -1600,7 +1606,7 @@ function renderTimeline() {
           <div class="t-date">${formatDate(item.date)}</div>
           ${item.note ? `<div style="margin-top:6px">${item.note}</div>` : ''}
         </div>
-      `
+      `,
     )
     .join('');
 }
@@ -1618,7 +1624,7 @@ setInterval(() => {
       { opacity: 0, transform: 'translateY(-6px)' },
       { opacity: 1, transform: 'translateY(0)' },
     ],
-    { duration: 800, easing: 'ease' }
+    { duration: 800, easing: 'ease' },
   );
   setTimeout(() => {
     quoteBox.textContent = `"${quotes[qIndex]}"`;
@@ -1633,7 +1639,7 @@ window.addEventListener(
       reveal();
     }
   },
-  { passive: true }
+  { passive: true },
 );
 
 window.addEventListener('resize', () => {
