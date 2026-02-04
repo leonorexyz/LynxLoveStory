@@ -1,0 +1,98 @@
+/* ======= Navigation Styles ======= */
+
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  background: linear-gradient(to bottom, rgba(255, 182, 193, 0.55), rgba(255, 182, 193, 0.25));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 0.6rem 1rem;
+}
+
+.nav-inner {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Sacramento', cursive;
+  font-size: 2rem;
+  color: #d63384;
+  letter-spacing: 0.5px;
+}
+
+.brand-title {
+  display: inline-block;
+}
+
+.brand-heart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: brandHeartFlip 2s linear infinite;
+  transform-origin: center;
+}
+
+.brand .typewriter {
+  --typewriter-caret-color: currentColor;
+}
+
+.menu {
+  display: flex;
+  gap: 18px;
+}
+
+.menu a {
+  text-decoration: none;
+  color: #7a5a6b;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 999px;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+  white-space: nowrap;
+}
+
+.menu a:hover {
+  background: var(--glass-2);
+  transform: translateY(-1px);
+  color: #52394a;
+}
+
+@media (max-width: 720px) {
+  nav {
+    padding: 0.7rem 1.2rem;
+  }
+  .nav-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .brand {
+    font-size: 1.8rem;
+  }
+  .menu {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    gap: 12px;
+  }
+  .menu a {
+    flex: 1 1 calc(50% - 12px);
+    text-align: center;
+    padding: 8px 0;
+  }
+}

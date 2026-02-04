@@ -1,0 +1,46 @@
+/* ======= Timeline & Quotes Styles ======= */
+
+.timeline {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+  padding-left: 20px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 28px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #ffc1d6;
+}
+
+.t-item {
+  position: relative;
+  margin: 18px 0 26px 0;
+  padding-left: 44px;
+}
+
+.t-item::before {
+  content: '';
+  position: absolute;
+  left: 18px;
+  top: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ff90c2, #ff6aa3);
+  box-shadow: 0 4px 10px rgba(255, 105, 180, 0.4);
+}
+
+.t-title {
+  font-weight: 700;
+  color: #b31264;
+}
+
+.t-date {
+  font-size: 0.9rem;
+  opacity: 0.75;
+}

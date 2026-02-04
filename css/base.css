@@ -1,0 +1,104 @@
+/* ======= Base Styles =======
+ * Variables, reset, typography, and core elements
+ */
+
+:root {
+  --bg1: #ffd1dc;
+  --bg2: #ffe4e1;
+  --pink: #ff69b4;
+  --rose: #ff8fb1;
+  --white: #ffffff;
+  --glass: rgba(255, 255, 255, 0.22);
+  --glass-2: rgba(255, 255, 255, 0.32);
+  --text: #5b4b56;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    'Poppins',
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    sans-serif;
+  color: var(--text);
+  background: radial-gradient(1200px 800px at 10% 10%, #fff6fa 0%, transparent 60%), radial-gradient(1000px 800px at 90% 20%, #fff2f7 0%, transparent 60%), linear-gradient(120deg, var(--bg1), var(--bg2));
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  cursor:
+    url('../images/heart_cursor.svg') 8 8,
+    auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 99, 163, 0.8) rgba(255, 255, 255, 0.35);
+}
+
+body::-webkit-scrollbar {
+  height: 12px;
+  width: 12px;
+}
+
+body::-webkit-scrollbar-track {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 235, 245, 0.35));
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 0 12px rgba(255, 105, 180, 0.18);
+}
+
+body::-webkit-scrollbar-thumb {
+  background: linear-gradient(200deg, rgba(255, 119, 179, 0.95), rgba(255, 68, 145, 0.85));
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 10px 20px rgba(214, 31, 114, 0.35);
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(200deg, rgba(255, 140, 194, 1), rgba(255, 90, 165, 0.95));
+}
+
+a,
+button {
+  cursor:
+    url('../images/heart_cursor.svg') 8 8,
+    pointer;
+}
+
+#particles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+h1 {
+  font-family: 'Sacramento', cursive;
+  font-size: clamp(2.6rem, 5vw, 4.6rem);
+  margin: 0 0 10px;
+  color: #c2185b;
+}
+
+h2 {
+  font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+  margin: 0 0 12px;
+  color: #c2185b;
+}
+
+p {
+  line-height: 1.7;
+  margin: 0;
+}
+
+footer {
+  text-align: center;
+  padding: 28px 16px;
+  color: #7a5a6b;
+}
